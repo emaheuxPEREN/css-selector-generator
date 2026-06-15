@@ -94,35 +94,33 @@ function App() {
           a JavaScript library that generates unique CSS selectors for any HTML element.
         </p>
       </div>
-      <div className="headers">
-        <div className="panel-header">
-          HTML
-          <button className="format-btn" onClick={handleFormat}>Format</button>
-        </div>
-        <div className="panel-header">
-          CSS Selectors
-          <span className="total-time">
-            {elementCount} elements, {totalTimeMs.toFixed(2)} ms
-            <button
-              className="info-btn"
-              onClick={() => setShowInfoPopover(!showInfoPopover)}
-            >
-              i
-            </button>
-            {showInfoPopover && (
-              <div className="info-popover">
-                <p>Total time to generate all CSS selectors.</p>
-                <p>Hover over individual selectors to see their generation time.</p>
-              </div>
-            )}
-          </span>
-        </div>
-      </div>
       <div className="panels-content">
         <div className="panel-column">
+          <div className="panel-header">
+            HTML
+            <button className="format-btn" onClick={handleFormat}>Format</button>
+          </div>
           <HtmlEditor value={htmlSource} onChange={setHtmlSource} />
         </div>
         <div className="panel-column">
+          <div className="panel-header">
+            CSS Selectors
+            <span className="total-time">
+              {elementCount} elements, {totalTimeMs.toFixed(2)} ms
+              <button
+                className="info-btn"
+                onClick={() => setShowInfoPopover(!showInfoPopover)}
+              >
+                i
+              </button>
+              {showInfoPopover && (
+                <div className="info-popover">
+                  <p>Total time to generate all CSS selectors.</p>
+                  <p>Hover over individual selectors to see their generation time.</p>
+                </div>
+              )}
+            </span>
+          </div>
           <SelectorPanel selectorsByLine={selectorsByLine} lineCount={lineCount} />
         </div>
       </div>
