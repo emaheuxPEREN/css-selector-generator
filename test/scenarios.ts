@@ -98,10 +98,6 @@ async function testScenario(
       const scenario: ParsedScenario = scenarioUtilities.parseScenario(
         doc.body,
       );
-      const needlesById = new Map(
-        scenario.needles.map((needle) => [needle.id, needle]),
-      );
-
       const result: ScenarioTestResult = {
         success: [],
         error: [],
@@ -115,9 +111,58 @@ async function testScenario(
         });
       }
 
+      const generatedByNeedle = new Map<string, string>();
+
+      scenario.needles.forEach(({ id, elements, root }) => {
+        if (elements.length === 0) {
+          return;
+        }
+        const generatedSelector = CssSelectorGenerator.getCssSelector(
+          elements.length === 1 ? elements[0] : elements,
+          root
+            ? { ...scenario.metadata.options, root }
+            : scenario.metadata.options,
+        );
+        generatedByNeedle.set(id, generatedSelector);
+
+        // Every generated selector must resolve back to exactly the elements
+        // it was generated for, searched from the same root the generator
+        // used. This catches malformed and under-specified selectors that an
+        // expected-string comparison cannot express.
+        const searchRoot = (root ?? elements[0].getRootNode()) as ParentNode;
+        let matched: Element[];
+        try {
+          matched = Array.from(searchRoot.querySelectorAll(generatedSelector));
+        } catch {
+          result.error.push({
+            key: id,
+            expectation: "a valid selector",
+            selector: generatedSelector,
+          });
+          return;
+        }
+
+        const isExact =
+          matched.length === elements.length &&
+          elements.every((element) => matched.includes(element));
+        if (isExact) {
+          result.success.push({
+            key: id,
+            expectation: "resolves to its own elements",
+            selector: generatedSelector,
+          });
+        } else {
+          result.error.push({
+            key: id,
+            expectation: `to resolve to its own ${String(elements.length)} element(s)`,
+            selector: `${generatedSelector} resolved to ${String(matched.length)}`,
+          });
+        }
+      });
+
       scenario.expectations.forEach(({ needleId, selector, negative }) => {
-        const needle = needlesById.get(needleId);
-        if (!needle || needle.elements.length === 0) {
+        const generatedSelector = generatedByNeedle.get(needleId);
+        if (generatedSelector === undefined) {
           result.error.push({
             key: selector,
             expectation: selector,
@@ -126,13 +171,6 @@ async function testScenario(
           return;
         }
 
-        const { elements, root } = needle;
-        const generatedSelector = CssSelectorGenerator.getCssSelector(
-          elements.length === 1 ? elements[0] : elements,
-          root
-            ? { ...scenario.metadata.options, root }
-            : scenario.metadata.options,
-        );
         const matches = selector === generatedSelector;
         result[matches !== negative ? "success" : "error"].push({
           expectation: negative ? `anything but ${selector}` : selector,
