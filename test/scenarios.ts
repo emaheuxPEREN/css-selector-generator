@@ -106,6 +106,15 @@ async function testScenario(
         success: [],
         error: [],
       };
+
+      if (scenario.expectations.length === 0) {
+        result.error.push({
+          key: "scenario",
+          expectation: "at least one expectation",
+          selector: "none found",
+        });
+      }
+
       scenario.expectations.forEach(({ needleId, selector }) => {
         const needle = needlesById.get(needleId);
         if (!needle || needle.elements.length === 0) {

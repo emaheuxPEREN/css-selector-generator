@@ -144,12 +144,12 @@ function findNeedleRoot(element: Element, roots: Set<Node>): ParentNode | null {
 }
 
 function forEachComment(
-  rootElement: Element,
+  root: Element | ShadowRoot,
   callback: (comment: Comment) => void,
 ): void {
   // The root may belong to another document, e.g. an iframe.
-  const iterator = rootElement.ownerDocument.createNodeIterator(
-    rootElement,
+  const iterator = root.ownerDocument.createNodeIterator(
+    root,
     NodeFilter.SHOW_COMMENT,
     { acceptNode: () => NodeFilter.FILTER_ACCEPT },
   );
@@ -159,6 +159,14 @@ function forEachComment(
       callback(currentNode);
     }
   }
+
+  // A node iterator does not cross shadow boundaries. Only open shadow roots
+  // are reachable, so scenarios cannot cover closed ones.
+  root.querySelectorAll("*").forEach((element) => {
+    if (element.shadowRoot) {
+      forEachComment(element.shadowRoot, callback);
+    }
+  });
 }
 
 export function parseScenario(rootElement: Element): ParsedScenario {

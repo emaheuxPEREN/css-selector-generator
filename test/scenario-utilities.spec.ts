@@ -356,6 +356,33 @@ describe("Scenario Utilities", () => {
       assert.equal(result.needles[0].root, null);
     });
 
+    it("should find needles inside an open shadow root", () => {
+      const host = rootElement.appendChild(document.createElement("div"));
+      const shadowRoot = host.attachShadow({ mode: "open" });
+      shadowRoot.innerHTML = `
+        <!-- root -->
+        <div class="shadowElement"><!-- expect: .shadowElement --></div>
+      `;
+      const result = parseScenario(rootElement);
+      assert.lengthOf(result.needles, 1);
+      assert.equal(
+        result.needles[0].elements[0],
+        shadowRoot.querySelector(".shadowElement"),
+      );
+      assert.equal(result.needles[0].root, shadowRoot);
+    });
+
+    it("should find needles inside a nested shadow root", () => {
+      const host = rootElement.appendChild(document.createElement("div"));
+      const outer = host.attachShadow({ mode: "open" });
+      const innerHost = outer.appendChild(document.createElement("div"));
+      const inner = innerHost.attachShadow({ mode: "open" });
+      inner.innerHTML = `<div class="deep"><!-- expect: .deep --></div>`;
+      const result = parseScenario(rootElement);
+      assert.lengthOf(result.needles, 1);
+      assert.equal(result.needles[0].elements[0], inner.querySelector(".deep"));
+    });
+
     it("should keep an expectation whose identifier was never applied", () => {
       rootElement.innerHTML = `<!-- expect: missing; .mockClass -->`;
       const result = parseScenario(rootElement);

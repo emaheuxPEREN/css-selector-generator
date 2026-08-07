@@ -1,0 +1,14 @@
+<!-- scenario
+title: Shadow DOM
+description: A selector for an element inside an open shadow root, scoped to that root.
+tags: shadow-dom, root
+-->
+
+<div class="shadowElement"></div>
+
+<div>
+  <template shadowrootmode="open">
+    <!-- root -->
+    <div class="shadowElement"><!-- expect: .shadowElement --></div>
+  </template>
+</div>

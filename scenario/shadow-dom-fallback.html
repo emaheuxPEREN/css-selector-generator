@@ -1,0 +1,13 @@
+<!-- scenario
+title: Shadow DOM fallback
+description: Children of a shadow root with nothing to identify them fall back to a scoped positional selector.
+tags: shadow-dom, root, fallback
+-->
+
+<div>
+  <template shadowrootmode="open">
+    <!-- root -->
+    <div><!-- expect: :scope > :nth-child(1) --></div>
+    <div></div>
+  </template>
+</div>
