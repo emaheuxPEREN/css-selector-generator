@@ -1,0 +1,11 @@
+<!-- scenario
+title: Option root
+description: Only the marked root is searched, so the span outside it is not a conflict.
+tags: options, root
+-->
+
+<span></span>
+
+<div><!-- root -->
+  <span><!-- expect: span --></span>
+</div>

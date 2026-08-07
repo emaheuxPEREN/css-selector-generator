@@ -108,6 +108,7 @@ export function parseFrontMatterContent(
 export interface ScenarioNeedle {
   id: string;
   elements: Element[];
+  root: ParentNode | null;
 }
 
 export interface ScenarioExpectation {
@@ -123,6 +124,23 @@ export interface ParsedScenario {
 
 function isCommentNode(node: Node): node is Comment {
   return node.nodeType === Node.COMMENT_NODE;
+}
+
+// Avoids `instanceof`, which does not hold across documents.
+function isShadowRoot(node: Node): node is ShadowRoot {
+  return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE && "host" in node;
+}
+
+/** Nearest ancestor marked with `<!-- root -->`, crossing shadow boundaries. */
+function findNeedleRoot(element: Element, roots: Set<Node>): ParentNode | null {
+  let node = element.parentNode;
+  while (node) {
+    if (roots.has(node)) {
+      return node;
+    }
+    node = isShadowRoot(node) ? node.host : node.parentNode;
+  }
+  return null;
 }
 
 function forEachComment(
@@ -147,6 +165,7 @@ export function parseScenario(rootElement: Element): ParsedScenario {
   const needles: ScenarioNeedle[] = [];
   const expectations: ScenarioExpectation[] = [];
   const needlesById = new Map<string, ScenarioNeedle>();
+  const roots = new Set<Node>();
   let metadata = emptyMetadata();
   let isFirstComment = true;
   let inlineCount = 0;
@@ -154,7 +173,7 @@ export function parseScenario(rootElement: Element): ParsedScenario {
   function getNeedle(id: string): ScenarioNeedle {
     let needle = needlesById.get(id);
     if (!needle) {
-      needle = { id, elements: [] };
+      needle = { id, elements: [], root: null };
       needlesById.set(id, needle);
       needles.push(needle);
     }
@@ -169,6 +188,13 @@ export function parseScenario(rootElement: Element): ParsedScenario {
         metadata = frontMatter;
         return;
       }
+    }
+
+    // `parentNode` rather than `parentElement`, so that a comment placed
+    // directly in a shadow root marks that shadow root.
+    if (comment.textContent.trim() === "root" && comment.parentNode) {
+      roots.add(comment.parentNode);
+      return;
     }
 
     const parsed = parseComment(comment);
@@ -196,6 +222,13 @@ export function parseScenario(rootElement: Element): ParsedScenario {
       const id = `#${String(inlineCount++)}`;
       getNeedle(id).elements.push(element);
       expectations.push({ needleId: id, selector: expectation });
+    }
+  });
+
+  // Resolved after the walk, so that a `<!-- root -->` may appear anywhere.
+  needles.forEach((needle) => {
+    if (needle.elements.length > 0) {
+      needle.root = findNeedleRoot(needle.elements[0], roots);
     }
   });
 

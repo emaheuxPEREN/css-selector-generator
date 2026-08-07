@@ -51,9 +51,7 @@ describe("Scenario Utilities", () => {
     });
 
     it("should keep colons in an attribute value", () => {
-      const result = parseCommentContent(
-        "expect: [href='http://example.com']",
-      );
+      const result = parseCommentContent("expect: [href='http://example.com']");
       assert.deepEqual(result, {
         expectation: "[href='http://example.com']",
       });
@@ -141,7 +139,7 @@ describe("Scenario Utilities", () => {
 
     it("should parse all supported keys", () => {
       const result = parseFrontMatterContent(
-        "\nscenario\ntitle: Mock title\ndescription: Mock description\ntags: aaa, bbb\noptions: {\"includeTag\": true}\n",
+        '\nscenario\ntitle: Mock title\ndescription: Mock description\ntags: aaa, bbb\noptions: {"includeTag": true}\n',
       );
       assert.deepEqual(result, {
         title: "Mock title",
@@ -224,7 +222,11 @@ describe("Scenario Utilities", () => {
       `;
       const result = parseScenario(rootElement);
       assert.deepEqual(result.needles, [
-        { id: "#0", elements: [rootElement.querySelector("#mockId")] },
+        {
+          id: "#0",
+          elements: [rootElement.querySelector("#mockId")],
+          root: null,
+        },
       ]);
       assert.deepEqual(result.expectations, [
         { needleId: "#0", selector: "#mockId" },
@@ -237,7 +239,11 @@ describe("Scenario Utilities", () => {
       `;
       const result = parseScenario(rootElement);
       assert.deepEqual(result.needles, [
-        { id: "mockElement", elements: [rootElement.querySelector("#mockId")] },
+        {
+          id: "mockElement",
+          elements: [rootElement.querySelector("#mockId")],
+          root: null,
+        },
       ]);
       assert.deepEqual(result.expectations, []);
     });
@@ -249,7 +255,11 @@ describe("Scenario Utilities", () => {
       `;
       const result = parseScenario(rootElement);
       assert.deepEqual(result.needles, [
-        { id: "mockElement", elements: [rootElement.querySelector("#mockId")] },
+        {
+          id: "mockElement",
+          elements: [rootElement.querySelector("#mockId")],
+          root: null,
+        },
       ]);
       assert.deepEqual(result.expectations, [
         { needleId: "mockElement", selector: "#mockId" },
@@ -263,8 +273,16 @@ describe("Scenario Utilities", () => {
       `;
       const result = parseScenario(rootElement);
       assert.deepEqual(result.needles, [
-        { id: "#0", elements: [rootElement.querySelector("#firstMockId")] },
-        { id: "#1", elements: [rootElement.querySelector("#secondMockId")] },
+        {
+          id: "#0",
+          elements: [rootElement.querySelector("#firstMockId")],
+          root: null,
+        },
+        {
+          id: "#1",
+          elements: [rootElement.querySelector("#secondMockId")],
+          root: null,
+        },
       ]);
       assert.deepEqual(result.expectations, [
         { needleId: "#0", selector: "#firstMockId" },
@@ -280,8 +298,8 @@ describe("Scenario Utilities", () => {
       const result = parseScenario(rootElement);
       const elements = rootElement.querySelectorAll(".mockClass");
       assert.deepEqual(result.needles, [
-        { id: "#0", elements: [elements[0]] },
-        { id: "#1", elements: [elements[1]] },
+        { id: "#0", elements: [elements[0]], root: null },
+        { id: "#1", elements: [elements[1]], root: null },
       ]);
     });
 
@@ -296,11 +314,46 @@ describe("Scenario Utilities", () => {
         {
           id: "mockElement",
           elements: [...rootElement.querySelectorAll(".mockClass")],
+          root: null,
         },
       ]);
       assert.deepEqual(result.expectations, [
         { needleId: "mockElement", selector: ".mockClass" },
       ]);
+    });
+
+    it("should assign the nearest marked ancestor as the needle root", () => {
+      rootElement.innerHTML = `
+        <span></span>
+        <div id="mockRoot"><!-- root -->
+          <span><!-- expect: span --></span>
+        </div>
+      `;
+      const result = parseScenario(rootElement);
+      assert.equal(
+        result.needles[0].root,
+        rootElement.querySelector("#mockRoot"),
+      );
+    });
+
+    it("should assign the innermost marked ancestor", () => {
+      rootElement.innerHTML = `
+        <div id="outer"><!-- root -->
+          <div id="inner"><!-- root -->
+            <span><!-- expect: span --></span>
+          </div>
+        </div>
+      `;
+      const result = parseScenario(rootElement);
+      assert.equal(result.needles[0].root, rootElement.querySelector("#inner"));
+    });
+
+    it("should not treat the marked element itself as rooted", () => {
+      rootElement.innerHTML = `
+        <div id="mockRoot"><!-- root --><!-- expect: div --></div>
+      `;
+      const result = parseScenario(rootElement);
+      assert.equal(result.needles[0].root, null);
     });
 
     it("should keep an expectation whose identifier was never applied", () => {
