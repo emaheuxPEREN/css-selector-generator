@@ -143,10 +143,7 @@ describe("selector - class", function () {
       });
       assert.lengthOf(result, 1);
       assert.include(result, ".nav-container" as CssSelectorGenerated);
-      assert.notInclude(
-        result,
-        ".makeStyles-root-123" as CssSelectorGenerated,
-      );
+      assert.notInclude(result, ".makeStyles-root-123" as CssSelectorGenerated);
     });
 
     it("should accept BEM notation", () => {
@@ -157,7 +154,10 @@ describe("selector - class", function () {
         ignoreGeneratedClassNames: true,
       });
       assert.lengthOf(result, 1);
-      assert.include(result, ".block__element--modifier" as CssSelectorGenerated);
+      assert.include(
+        result,
+        ".block__element--modifier" as CssSelectorGenerated,
+      );
       assert.notInclude(result, ".css-abc123" as CssSelectorGenerated);
     });
 

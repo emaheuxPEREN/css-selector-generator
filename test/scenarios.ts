@@ -115,7 +115,7 @@ async function testScenario(
         });
       }
 
-      scenario.expectations.forEach(({ needleId, selector }) => {
+      scenario.expectations.forEach(({ needleId, selector, negative }) => {
         const needle = needlesById.get(needleId);
         if (!needle || needle.elements.length === 0) {
           result.error.push({
@@ -133,8 +133,9 @@ async function testScenario(
             ? { ...scenario.metadata.options, root }
             : scenario.metadata.options,
         );
-        result[selector === generatedSelector ? "success" : "error"].push({
-          expectation: selector,
+        const matches = selector === generatedSelector;
+        result[matches !== negative ? "success" : "error"].push({
+          expectation: negative ? `anything but ${selector}` : selector,
           selector: generatedSelector,
           key: selector,
         });

@@ -95,7 +95,10 @@ describe("selector - fallback", function () {
     const targetElement = root.querySelector("span");
     const result = getFallbackSelector([targetElement], root);
     assert.ok(testSelector([targetElement], result, root));
-    assert.equal(result, ":scope > :nth-child(1) > :nth-child(3) > :nth-child(1)");
+    assert.equal(
+      result,
+      ":scope > :nth-child(1) > :nth-child(3) > :nth-child(1)",
+    );
   });
 
   it("should work with elements in iframe", () => {

@@ -45,6 +45,23 @@ describe("Scenario Utilities", () => {
       });
     });
 
+    it("should parse a negative expectation", () => {
+      const result = parseCommentContent("expect-not: .aaa.bbb");
+      assert.deepEqual(result, {
+        expectation: ".aaa.bbb",
+        negative: true,
+      });
+    });
+
+    it("should parse a negative group expectation", () => {
+      const result = parseCommentContent("expect-not: needle; .aaa.bbb");
+      assert.deepEqual(result, {
+        identifier: "needle",
+        expectation: ".aaa.bbb",
+        negative: true,
+      });
+    });
+
     it("should keep colons that are part of the expectation", () => {
       const result = parseCommentContent("expect: .aaa\\:bbb");
       assert.deepEqual(result, { expectation: ".aaa\\:bbb" });
@@ -229,7 +246,7 @@ describe("Scenario Utilities", () => {
         },
       ]);
       assert.deepEqual(result.expectations, [
-        { needleId: "#0", selector: "#mockId" },
+        { needleId: "#0", selector: "#mockId", negative: false },
       ]);
     });
 
@@ -262,7 +279,7 @@ describe("Scenario Utilities", () => {
         },
       ]);
       assert.deepEqual(result.expectations, [
-        { needleId: "mockElement", selector: "#mockId" },
+        { needleId: "mockElement", selector: "#mockId", negative: false },
       ]);
     });
 
@@ -285,8 +302,8 @@ describe("Scenario Utilities", () => {
         },
       ]);
       assert.deepEqual(result.expectations, [
-        { needleId: "#0", selector: "#firstMockId" },
-        { needleId: "#1", selector: "#secondMockId" },
+        { needleId: "#0", selector: "#firstMockId", negative: false },
+        { needleId: "#1", selector: "#secondMockId", negative: false },
       ]);
     });
 
@@ -318,7 +335,7 @@ describe("Scenario Utilities", () => {
         },
       ]);
       assert.deepEqual(result.expectations, [
-        { needleId: "mockElement", selector: ".mockClass" },
+        { needleId: "mockElement", selector: ".mockClass", negative: false },
       ]);
     });
 
@@ -383,12 +400,22 @@ describe("Scenario Utilities", () => {
       assert.equal(result.needles[0].elements[0], inner.querySelector(".deep"));
     });
 
+    it("should mark a negative expectation", () => {
+      rootElement.innerHTML = `
+        <div class="aaa bbb"><!-- expect-not: .aaa.bbb --></div>
+      `;
+      const result = parseScenario(rootElement);
+      assert.deepEqual(result.expectations, [
+        { needleId: "#0", selector: ".aaa.bbb", negative: true },
+      ]);
+    });
+
     it("should keep an expectation whose identifier was never applied", () => {
       rootElement.innerHTML = `<!-- expect: missing; .mockClass -->`;
       const result = parseScenario(rootElement);
       assert.deepEqual(result.needles, []);
       assert.deepEqual(result.expectations, [
-        { needleId: "missing", selector: ".mockClass" },
+        { needleId: "missing", selector: ".mockClass", negative: false },
       ]);
     });
   });

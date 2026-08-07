@@ -20,18 +20,20 @@ interface ScenarioExpectationItem {
   element?: Element;
   identifier?: string;
   expectation?: string;
+  negative?: boolean;
 }
 
 export function parseCommentContent(
   content: string,
 ): ScenarioExpectationItem | null {
   const [key, val] = splitContent(content, COMMENT_SPLITTER);
-  if (key === "expect") {
+  if (key === "expect" || key === "expect-not") {
+    const negative = key === "expect-not" ? { negative: true } : {};
     const [identifier, expectation] = splitContent(val, EXPECTATION_SPLITTER);
     if (identifier && expectation) {
-      return { identifier, expectation };
+      return { identifier, expectation, ...negative };
     } else {
-      return { expectation };
+      return { expectation, ...negative };
     }
   }
   if (key === "identifier") {
@@ -114,6 +116,8 @@ export interface ScenarioNeedle {
 export interface ScenarioExpectation {
   needleId: string;
   selector: string;
+  /** The generated selector must differ from `selector`. */
+  negative: boolean;
 }
 
 export interface ParsedScenario {
@@ -209,13 +213,17 @@ export function parseScenario(rootElement: Element): ParsedScenario {
     if (!parsed) {
       return;
     }
-    const { element, identifier, expectation } = parsed;
+    const { element, identifier, expectation, negative = false } = parsed;
 
     if (identifier && expectation) {
       // Deliberately does not create the needle, so that an expectation
       // naming an identifier that was never applied is reported rather than
       // silently dropped.
-      expectations.push({ needleId: identifier, selector: expectation });
+      expectations.push({
+        needleId: identifier,
+        selector: expectation,
+        negative,
+      });
       return;
     }
     if (!element) {
@@ -229,7 +237,7 @@ export function parseScenario(rootElement: Element): ParsedScenario {
       // `#` cannot occur in an authored identifier, so this cannot collide.
       const id = `#${String(inlineCount++)}`;
       getNeedle(id).elements.push(element);
-      expectations.push({ needleId: id, selector: expectation });
+      expectations.push({ needleId: id, selector: expectation, negative });
     }
   });
 

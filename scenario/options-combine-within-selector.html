@@ -1,0 +1,13 @@
+<!-- scenario
+title: Option combineWithinSelector disabled
+description: With combining disabled, two class names must not be merged into one selector.
+tags: options, class
+options: {"combineWithinSelector": false}
+-->
+
+<div class="aaa bbb">
+  <!-- expect-not: .aaa.bbb -->
+  <!-- expect-not: .bbb.aaa -->
+</div>
+<div class="aaa"></div>
+<div class="bbb"></div>

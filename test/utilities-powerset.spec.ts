@@ -96,9 +96,7 @@ describe("utilities - powerset", () => {
   it("should stay lazy and not materialize the full power set when maxResults is small", () => {
     const input = Array.from({ length: 1000 }, (_, index) => index);
     const startTime = Date.now();
-    const result = Array.from(
-      powerSetGenerator(input, { maxResults: 50 }),
-    );
+    const result = Array.from(powerSetGenerator(input, { maxResults: 50 }));
     assert.lengthOf(result, 50);
     assert.isBelow(Date.now() - startTime, 1000);
   });
