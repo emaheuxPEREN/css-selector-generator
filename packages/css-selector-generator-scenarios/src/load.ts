@@ -11,6 +11,11 @@ export async function createScenarioFrame(
   hostDocument: Document,
 ): Promise<HTMLIFrameElement> {
   const iframe = hostDocument.createElement("iframe");
+  // Moved out of view rather than hidden with `display`, so that the scenario
+  // still gets laid out the way it would on a real page.
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.style.cssText =
+    "position:absolute;top:-9999px;left:-9999px;visibility:hidden";
   iframe.srcdoc = `<!DOCTYPE html><html lang="en"><head></head><body>${html}</body></html>`;
   const loaded = new Promise<void>((resolve) => {
     iframe.addEventListener("load", () => {

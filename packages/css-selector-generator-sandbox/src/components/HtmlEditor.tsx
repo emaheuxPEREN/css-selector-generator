@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface HtmlEditorProps {
   value: string;
@@ -13,7 +13,7 @@ export function HtmlEditor({ value, onChange }: HtmlEditorProps) {
     if (!textarea) return;
 
     // Reset height to auto to get the correct scrollHeight
-    textarea.style.height = 'auto';
+    textarea.style.height = "auto";
     // Set height to scrollHeight to fit content
     textarea.style.height = `${textarea.scrollHeight}px`;
   }, [value]);

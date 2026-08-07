@@ -1,8 +1,23 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { HtmlEditor } from './components/HtmlEditor';
-import { SelectorPanel } from './components/SelectorPanel';
-import { mapSelectorsToLines, getLineCount, type SelectorWithTiming } from './utils/selectorMapper';
-import { formatHtml } from './utils/formatHtml';
+import { useState, useEffect } from "react";
+import {
+  createScenarioFrame,
+  scenarios,
+} from "css-selector-generator-scenarios";
+import { HtmlEditor } from "./components/HtmlEditor";
+import { SelectorPanel } from "./components/SelectorPanel";
+import { ScenarioPicker } from "./components/ScenarioPicker";
+import {
+  mapSelectorsToLines,
+  getLineCount,
+  type SelectorWithTiming,
+} from "./utils/selectorMapper";
+import { formatHtml } from "./utils/formatHtml";
+
+// The line mapper pairs source tags with elements found by walking the
+// rendered DOM, which cannot see into shadow roots.
+const PICKABLE_SCENARIOS = scenarios.filter(
+  (scenario) => !scenario.tags.includes("shadow-dom"),
+);
 
 const SAMPLE_HTML = `<section class="demo">
   <article>
@@ -49,35 +64,49 @@ const SAMPLE_HTML = `<section class="demo">
 
 function App() {
   const [htmlSource, setHtmlSource] = useState(SAMPLE_HTML);
-  const [selectorsByLine, setSelectorsByLine] = useState<Map<number, SelectorWithTiming[]>>(new Map());
+  const [selectorsByLine, setSelectorsByLine] = useState<
+    Map<number, SelectorWithTiming[]>
+  >(new Map());
   const [totalTimeMs, setTotalTimeMs] = useState(0);
   const [showInfoPopover, setShowInfoPopover] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const updateSelectors = useCallback(() => {
-    if (!iframeRef.current?.contentDocument) return;
-
-    const doc = iframeRef.current.contentDocument;
-
-    // Write HTML to the iframe's document body
-    doc.body.innerHTML = htmlSource;
-
-    // Generate selectors using the iframe's body as root
-    const result = mapSelectorsToLines(htmlSource, doc.body);
-    setSelectorsByLine(result.selectorsByLine);
-    setTotalTimeMs(result.totalTimeMs);
-  }, [htmlSource]);
+  const [scenarioId, setScenarioId] = useState("");
 
   useEffect(() => {
-    updateSelectors();
-  }, [updateSelectors]);
+    let cancelled = false;
+
+    void (async () => {
+      // Loaded the same way as in the library's tests, so that the document
+      // shape matches. Selectors can still differ from a scenario's stated
+      // expectation, because everything here is generated against the body.
+      const iframe = await createScenarioFrame(htmlSource, document);
+      try {
+        const doc = iframe.contentDocument;
+        if (!doc || cancelled) return;
+        const result = mapSelectorsToLines(htmlSource, doc.body);
+        setSelectorsByLine(result.selectorsByLine);
+        setTotalTimeMs(result.totalTimeMs);
+      } finally {
+        iframe.remove();
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [htmlSource]);
+
+  const handleScenarioChange = (id: string) => {
+    setScenarioId(id);
+    const scenario = PICKABLE_SCENARIOS.find((item) => item.id === id);
+    setHtmlSource(scenario ? scenario.html.trim() : SAMPLE_HTML);
+  };
 
   const lineCount = getLineCount(htmlSource);
 
   // Calculate total element count
   const elementCount = Array.from(selectorsByLine.values()).reduce(
     (total, selectors) => total + selectors.length,
-    0
+    0,
   );
 
   const handleFormat = () => {
@@ -89,17 +118,27 @@ function App() {
       <div className="app-title">
         <h1>CSS Selector Generator Sandbox</h1>
         <p>
-          A playground for testing{' '}
-          <a href="https://github.com/fczbkk/css-selector-generator#readme">css-selector-generator</a>,
-          a JavaScript library that generates unique CSS selectors for any HTML element.
+          A playground for testing{" "}
+          <a href="https://github.com/fczbkk/css-selector-generator#readme">
+            css-selector-generator
+          </a>
+          , a JavaScript library that generates unique CSS selectors for any
+          HTML element.
         </p>
       </div>
       <div className="panels-content">
         <div className="panel-column">
           <div className="panel-header">
             HTML
-            <button className="format-btn" onClick={handleFormat}>Format</button>
+            <button className="format-btn" onClick={handleFormat}>
+              Format
+            </button>
           </div>
+          <ScenarioPicker
+            scenarios={PICKABLE_SCENARIOS}
+            value={scenarioId}
+            onChange={handleScenarioChange}
+          />
           <HtmlEditor value={htmlSource} onChange={setHtmlSource} />
         </div>
         <div className="panel-column">
@@ -116,15 +155,20 @@ function App() {
               {showInfoPopover && (
                 <div className="info-popover">
                   <p>Total time to generate all CSS selectors.</p>
-                  <p>Hover over individual selectors to see their generation time.</p>
+                  <p>
+                    Hover over individual selectors to see their generation
+                    time.
+                  </p>
                 </div>
               )}
             </span>
           </div>
-          <SelectorPanel selectorsByLine={selectorsByLine} lineCount={lineCount} />
+          <SelectorPanel
+            selectorsByLine={selectorsByLine}
+            lineCount={lineCount}
+          />
         </div>
       </div>
-      <iframe ref={iframeRef} className="hidden-container" title="HTML Renderer" />
     </div>
   );
 }

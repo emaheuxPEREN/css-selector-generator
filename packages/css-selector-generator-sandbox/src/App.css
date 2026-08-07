@@ -219,3 +219,28 @@ body {
   top: -9999px;
   visibility: hidden;
 }
+
+.scenario-picker {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-color, #ddd);
+}
+
+.scenario-picker label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.scenario-picker select {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem;
+  font: inherit;
+}
+
+.scenario-description {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}

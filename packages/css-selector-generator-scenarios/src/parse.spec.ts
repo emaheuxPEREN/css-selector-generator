@@ -6,6 +6,15 @@ import {
   parseScenario,
 } from "./parse.js";
 
+/** Fails the test loudly rather than yielding null into an assertion. */
+function find(root: ParentNode, selector: string): Element {
+  const element = root.querySelector(selector);
+  if (!element) {
+    throw new Error(`No element matches "${selector}".`);
+  }
+  return element;
+}
+
 describe("Scenario Utilities", () => {
   let rootElement: Element;
 
@@ -120,7 +129,7 @@ describe("Scenario Utilities", () => {
       const result = parseComment(comment);
       assert.deepEqual(result, {
         identifier: "mock identifier",
-        element: comment.parentElement,
+        element: comment.parentElement ?? undefined,
       });
     });
 
@@ -129,7 +138,7 @@ describe("Scenario Utilities", () => {
       const result = parseComment(comment);
       assert.deepEqual(result, {
         expectation: "mock expectation",
-        element: comment.parentElement,
+        element: comment.parentElement ?? undefined,
       });
     });
 
@@ -180,7 +189,7 @@ describe("Scenario Utilities", () => {
       const result = parseFrontMatterContent(
         "scenario\ndescription: Two elements: one id",
       );
-      assert.equal(result.description, "Two elements: one id");
+      assert.equal(result?.description, "Two elements: one id");
     });
 
     it("should throw on invalid options JSON", () => {
@@ -241,7 +250,7 @@ describe("Scenario Utilities", () => {
       assert.deepEqual(result.needles, [
         {
           id: "#0",
-          elements: [rootElement.querySelector("#mockId")],
+          elements: [find(rootElement, "#mockId")],
           root: null,
         },
       ]);
@@ -258,7 +267,7 @@ describe("Scenario Utilities", () => {
       assert.deepEqual(result.needles, [
         {
           id: "mockElement",
-          elements: [rootElement.querySelector("#mockId")],
+          elements: [find(rootElement, "#mockId")],
           root: null,
         },
       ]);
@@ -274,7 +283,7 @@ describe("Scenario Utilities", () => {
       assert.deepEqual(result.needles, [
         {
           id: "mockElement",
-          elements: [rootElement.querySelector("#mockId")],
+          elements: [find(rootElement, "#mockId")],
           root: null,
         },
       ]);
@@ -292,12 +301,12 @@ describe("Scenario Utilities", () => {
       assert.deepEqual(result.needles, [
         {
           id: "#0",
-          elements: [rootElement.querySelector("#firstMockId")],
+          elements: [find(rootElement, "#firstMockId")],
           root: null,
         },
         {
           id: "#1",
-          elements: [rootElement.querySelector("#secondMockId")],
+          elements: [find(rootElement, "#secondMockId")],
           root: null,
         },
       ]);
@@ -347,10 +356,7 @@ describe("Scenario Utilities", () => {
         </div>
       `;
       const result = parseScenario(rootElement);
-      assert.equal(
-        result.needles[0].root,
-        rootElement.querySelector("#mockRoot"),
-      );
+      assert.equal(result.needles[0].root, find(rootElement, "#mockRoot"));
     });
 
     it("should assign the innermost marked ancestor", () => {
@@ -362,7 +368,7 @@ describe("Scenario Utilities", () => {
         </div>
       `;
       const result = parseScenario(rootElement);
-      assert.equal(result.needles[0].root, rootElement.querySelector("#inner"));
+      assert.equal(result.needles[0].root, find(rootElement, "#inner"));
     });
 
     it("should not treat the marked element itself as rooted", () => {
@@ -384,7 +390,7 @@ describe("Scenario Utilities", () => {
       assert.lengthOf(result.needles, 1);
       assert.equal(
         result.needles[0].elements[0],
-        shadowRoot.querySelector(".shadowElement"),
+        find(shadowRoot, ".shadowElement"),
       );
       assert.equal(result.needles[0].root, shadowRoot);
     });
@@ -397,7 +403,7 @@ describe("Scenario Utilities", () => {
       inner.innerHTML = `<div class="deep"><!-- expect: .deep --></div>`;
       const result = parseScenario(rootElement);
       assert.lengthOf(result.needles, 1);
-      assert.equal(result.needles[0].elements[0], inner.querySelector(".deep"));
+      assert.equal(result.needles[0].elements[0], find(inner, ".deep"));
     });
 
     it("should mark a negative expectation", () => {

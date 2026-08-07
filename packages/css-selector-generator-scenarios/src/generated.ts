@@ -4,11 +4,13 @@ import type { Scenario } from "./types.js";
 export const scenarios: Scenario[] = [
   {
     "id": "ancestor-class",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Ancestor class for context",
+    "description": "The class is not unique on its own, so an ancestor is needed to narrow it down.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa\">\n  <div class=\"bbb\">\n    <!-- expect: .aaa .bbb -->\n  </div>\n</div>\n\n<div class=\"ccc\">\n  <!-- this prevents creation of simple .bbb selector -->\n  <div class=\"bbb\"></div>\n</div>\n"
+    "html": "<!-- scenario\ntitle: Ancestor class for context\ndescription: The class is not unique on its own, so an ancestor is needed to narrow it down.\ntags: class\n-->\n\n<div class=\"aaa\">\n  <div class=\"bbb\">\n    <!-- expect: .aaa .bbb -->\n  </div>\n</div>\n\n<div class=\"ccc\">\n  <!-- this prevents creation of simple .bbb selector -->\n  <div class=\"bbb\"></div>\n</div>\n"
   },
   {
     "id": "attribute-semicolon-value",
@@ -58,11 +60,13 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "class-combination",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Combination of class names",
+    "description": "Neither class is unique alone, so two of them are combined.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa bbb\"><!-- expect: .aaa.bbb --></div>\n<div class=\"aaa ccc\"></div>\n<div class=\"bbb ccc\"></div>\n"
+    "html": "<!-- scenario\ntitle: Combination of class names\ndescription: Neither class is unique alone, so two of them are combined.\ntags: class\n-->\n\n<div class=\"aaa bbb\"><!-- expect: .aaa.bbb --></div>\n<div class=\"aaa ccc\"></div>\n<div class=\"bbb ccc\"></div>\n"
   },
   {
     "id": "class-empty",
@@ -77,11 +81,15 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "class-escaped-colon",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Class containing a colon",
+    "description": "Characters that are special in a selector have to be escaped and still match.",
+    "tags": [
+      "class",
+      "escaping",
+      "gotcha"
+    ],
     "options": {},
-    "html": "<!--\n  Class names containing characters that must be escaped in a selector.\n  The generated selector has to escape them AND still resolve back to the\n  element, which is what the old greedy comment splitter made impossible to\n  express: it split `expect: .aaa\\:bbb` on the LAST colon.\n-->\n\n<div class=\"aaa:bbb\"><!-- expect: .aaa\\:bbb --></div>\n\n<div class=\"ccc+ddd\"><!-- expect: .ccc\\+ddd --></div>\n"
+    "html": "<!-- scenario\ntitle: Class containing a colon\ndescription: Characters that are special in a selector have to be escaped and still match.\ntags: class, escaping, gotcha\n-->\n\n<div class=\"aaa:bbb\"><!-- expect: .aaa\\:bbb --></div>\n\n<div class=\"ccc+ddd\"><!-- expect: .ccc\\+ddd --></div>\n"
   },
   {
     "id": "class-leading-digit",
@@ -107,11 +115,13 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "class-single",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Single class name",
+    "description": "One class is enough when it appears only once.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa bbb\"><!-- expect: .bbb --></div>\n<div class=\"aaa ccc\"></div>\n"
+    "html": "<!-- scenario\ntitle: Single class name\ndescription: One class is enough when it appears only once.\ntags: class\n-->\n\n<div class=\"aaa bbb\"><!-- expect: .bbb --></div>\n<div class=\"aaa ccc\"></div>\n"
   },
   {
     "id": "class-whitespace-only",
@@ -136,11 +146,13 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "deep-selector",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Deeply nested element",
+    "description": "An element several levels down, identified through its ancestors.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div id=\"aaa\" class=\"aaa\">\n  <div>\n    <div class=\"aaa\"><!-- expect:  #aaa .aaa --></div>\n  </div>\n</div>\n"
+    "html": "<!-- scenario\ntitle: Deeply nested element\ndescription: An element several levels down, identified through its ancestors.\ntags: class\n-->\n\n<div id=\"aaa\" class=\"aaa\">\n  <div>\n    <div class=\"aaa\"><!-- expect:  #aaa .aaa --></div>\n  </div>\n</div>\n"
   },
   {
     "id": "id-duplicate",
@@ -259,19 +271,23 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "multiple-classes",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Element with several classes",
+    "description": "Picking among the class names available on one element.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa bbb\">\n  <!-- expect: .aaa.bbb -->\n</div>\n\n<!-- These two elements prevent the generator from creating simple single-class selector (e.g. \".aaa\" or \".bbb\". -->\n<div class=\"aaa\"></div>\n<div class=\"bbb\"></div>\n\n"
+    "html": "<!-- scenario\ntitle: Element with several classes\ndescription: Picking among the class names available on one element.\ntags: class\n-->\n\n<div class=\"aaa bbb\">\n  <!-- expect: .aaa.bbb -->\n</div>\n\n<!-- These two elements prevent the generator from creating simple single-class selector (e.g. \".aaa\" or \".bbb\". -->\n<div class=\"aaa\"></div>\n<div class=\"bbb\"></div>\n\n"
   },
   {
     "id": "multiple-elements-different-tags",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Group of differently tagged elements",
+    "description": "One selector covering elements that share nothing but their position.",
+    "tags": [
+      "multiple"
+    ],
     "options": {},
-    "html": "<div><!-- identifier: needle --></div>\n<p><!-- identifier: needle --></p>\n\n<!-- expect: needle; div, p -->\n"
+    "html": "<!-- scenario\ntitle: Group of differently tagged elements\ndescription: One selector covering elements that share nothing but their position.\ntags: multiple\n-->\n\n<div><!-- identifier: needle --></div>\n<p><!-- identifier: needle --></p>\n\n<!-- expect: needle; div, p -->\n"
   },
   {
     "id": "multiple-elements-escaped",
@@ -287,43 +303,56 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "multiple-elements-fallback",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Group needing a fallback",
+    "description": "Nothing identifies the group, so each element gets a positional selector.",
+    "tags": [
+      "multiple",
+      "fallback"
+    ],
     "options": {},
-    "html": "<div><!-- identifier: needle --></div>\n<div><!-- identifier: needle --></div>\n\n<!-- this prevents creation of common `div` selector -->\n<div></div>\n\n<!--\n  NOTE: The first two parts of the fallback selector chain are:\n  :root -> HTML\n  :nth-child(2) -> BODY\n-->\n<!-- expect: needle; :root > :nth-child(2) > :nth-child(1), :root > :nth-child(2) > :nth-child(2) -->\n"
+    "html": "<!-- scenario\ntitle: Group needing a fallback\ndescription: Nothing identifies the group, so each element gets a positional selector.\ntags: multiple, fallback\n-->\n\n<div><!-- identifier: needle --></div>\n<div><!-- identifier: needle --></div>\n\n<!-- this prevents creation of common `div` selector -->\n<div></div>\n\n<!--\n  NOTE: The first two parts of the fallback selector chain are:\n  :root -> HTML\n  :nth-child(2) -> BODY\n-->\n<!-- expect: needle; :root > :nth-child(2) > :nth-child(1), :root > :nth-child(2) > :nth-child(2) -->\n"
   },
   {
     "id": "multiple-elements-nested",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Group of nested elements",
+    "description": "A group whose members sit at different depths.",
+    "tags": [
+      "multiple"
+    ],
     "options": {},
-    "html": "<div class=\"aaa\">\n  <!-- identifier: needle -->\n  <div class=\"aaa\">\n    <!-- identifier: needle -->\n    <div class=\"aaa\">\n      <!-- identifier: needle -->\n    </div>\n  </div>\n</div>\n\n<!-- expect: needle; .aaa -->\n"
+    "html": "<!-- scenario\ntitle: Group of nested elements\ndescription: A group whose members sit at different depths.\ntags: multiple\n-->\n\n<div class=\"aaa\">\n  <!-- identifier: needle -->\n  <div class=\"aaa\">\n    <!-- identifier: needle -->\n    <div class=\"aaa\">\n      <!-- identifier: needle -->\n    </div>\n  </div>\n</div>\n\n<!-- expect: needle; .aaa -->\n"
   },
   {
     "id": "multiple-elements-no-shared-class",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Group with no shared class",
+    "description": "With nothing in common, the selector becomes a list.",
+    "tags": [
+      "multiple",
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa\"><!-- identifier: needle --></div>\n<p class=\"bbb\"><!-- identifier: needle --></p>\n\n<!-- expect: needle; .aaa, .bbb -->\n"
+    "html": "<!-- scenario\ntitle: Group with no shared class\ndescription: With nothing in common, the selector becomes a list.\ntags: multiple, class\n-->\n\n<div class=\"aaa\"><!-- identifier: needle --></div>\n<p class=\"bbb\"><!-- identifier: needle --></p>\n\n<!-- expect: needle; .aaa, .bbb -->\n"
   },
   {
     "id": "multiple-elements-shared-class",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Group sharing a class",
+    "description": "A single class covers every element in the group.",
+    "tags": [
+      "multiple",
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa bbb\"><!-- identifier: needle --></div>\n<div class=\"bbb ccc\"><!-- identifier: needle --></div>\n\n<!-- expect: needle; .bbb -->\n"
+    "html": "<!-- scenario\ntitle: Group sharing a class\ndescription: A single class covers every element in the group.\ntags: multiple, class\n-->\n\n<div class=\"aaa bbb\"><!-- identifier: needle --></div>\n<div class=\"bbb ccc\"><!-- identifier: needle --></div>\n\n<!-- expect: needle; .bbb -->\n"
   },
   {
     "id": "multiple-elements",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Group of elements",
+    "description": "One selector matching several elements at once.",
+    "tags": [
+      "multiple"
+    ],
     "options": {},
-    "html": "<div class=\"aaa\"><!-- identifier: needle --></div>\n<div class=\"aaa\"><!-- identifier: needle --></div>\n<div class=\"aaa\"><!-- identifier: needle --></div>\n\n<!-- expect: needle; .aaa -->\n"
+    "html": "<!-- scenario\ntitle: Group of elements\ndescription: One selector matching several elements at once.\ntags: multiple\n-->\n\n<div class=\"aaa\"><!-- identifier: needle --></div>\n<div class=\"aaa\"><!-- identifier: needle --></div>\n<div class=\"aaa\"><!-- identifier: needle --></div>\n\n<!-- expect: needle; .aaa -->\n"
   },
   {
     "id": "nth-child-not-unique-alone",
@@ -493,35 +522,44 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "selector-class",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Class selector",
+    "description": "The class is preferred over the tag name.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div class=\"aaa\">\n  <!-- expect: .aaa -->\n</div>\n"
+    "html": "<!-- scenario\ntitle: Class selector\ndescription: The class is preferred over the tag name.\ntags: class\n-->\n\n<div class=\"aaa\">\n  <!-- expect: .aaa -->\n</div>\n"
   },
   {
     "id": "selector-descendant",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Descendant selector",
+    "description": "The element is identified through an ancestor.",
+    "tags": [
+      "class"
+    ],
     "options": {},
-    "html": "<div>\n  <span>\n    <!-- expect: div > span -->\n    <span></span>\n  </span>\n</div>\n"
+    "html": "<!-- scenario\ntitle: Descendant selector\ndescription: The element is identified through an ancestor.\ntags: class\n-->\n\n<div>\n  <span>\n    <!-- expect: div > span -->\n    <span></span>\n  </span>\n</div>\n"
   },
   {
     "id": "selector-fallback",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Fallback selector",
+    "description": "With nothing to identify the element, a positional chain is used.",
+    "tags": [
+      "fallback"
+    ],
     "options": {},
-    "html": "<div><!-- identifier: needle --></div>\n\n<!-- this prevents creation of a `div` selector -->\n<div></div>\n\n<!--\n  NOTE: The first two parts of the fallback selector chain are:\n  :root -> HTML\n  :nth-child(2) -> BODY\n-->\n<!-- expect: needle; :root > :nth-child(2) > :nth-child(1) -->\n"
+    "html": "<!-- scenario\ntitle: Fallback selector\ndescription: With nothing to identify the element, a positional chain is used.\ntags: fallback\n-->\n\n<div><!-- identifier: needle --></div>\n\n<!-- this prevents creation of a `div` selector -->\n<div></div>\n\n<!--\n  NOTE: The first two parts of the fallback selector chain are:\n  :root -> HTML\n  :nth-child(2) -> BODY\n-->\n<!-- expect: needle; :root > :nth-child(2) > :nth-child(1) -->\n"
   },
   {
     "id": "selector-type-combination",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Combination of selector types",
+    "description": "An id and a class combined to reach uniqueness.",
+    "tags": [
+      "id",
+      "class"
+    ],
     "options": {},
-    "html": "<div id=\"first\">\n  <div class=\"aaa\">\n    <!-- expect: #first .aaa -->\n  </div>\n</div>\n\n<div id=\"second\">\n  <div class=\"aaa\"></div>\n</div>\n"
+    "html": "<!-- scenario\ntitle: Combination of selector types\ndescription: An id and a class combined to reach uniqueness.\ntags: id, class\n-->\n\n<div id=\"first\">\n  <div class=\"aaa\">\n    <!-- expect: #first .aaa -->\n  </div>\n</div>\n\n<div id=\"second\">\n  <div class=\"aaa\"></div>\n</div>\n"
   },
   {
     "id": "shadow-dom-basic",
@@ -570,10 +608,12 @@ export const scenarios: Scenario[] = [
   },
   {
     "id": "tag",
-    "title": null,
-    "description": null,
-    "tags": [],
+    "title": "Tag selector",
+    "description": "A tag name is enough when it appears only once.",
+    "tags": [
+      "tag"
+    ],
     "options": {},
-    "html": "<div><!-- expect: div --></div>\n<p>\n  <!-- expect: p -->\n  <span><!-- expect: span --></span>\n</p>\n"
+    "html": "<!-- scenario\ntitle: Tag selector\ndescription: A tag name is enough when it appears only once.\ntags: tag\n-->\n\n<div><!-- expect: div --></div>\n<p>\n  <!-- expect: p -->\n  <span><!-- expect: span --></span>\n</p>\n"
   }
 ];

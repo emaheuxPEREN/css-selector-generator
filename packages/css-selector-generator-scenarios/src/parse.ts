@@ -46,7 +46,8 @@ export function parseComment(comment: Comment): ScenarioExpectationItem | null {
   const result = parseCommentContent(comment.textContent);
   if (result) {
     if (!result.expectation || !result.identifier) {
-      result.element = comment.parentElement;
+      // Null for a comment that is a direct child of a document or fragment.
+      result.element = comment.parentElement ?? undefined;
     }
     return result;
   }

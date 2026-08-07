@@ -67,7 +67,8 @@ function parseOpeningTags(htmlSource: string): TagInfo[] {
 // Get all elements from a container in document order
 function getAllElements(container: Element): Element[] {
   const elements: Element[] = [];
-  const walker = document.createTreeWalker(
+  // The container lives in the scenario iframe, not in this document.
+  const walker = container.ownerDocument.createTreeWalker(
     container,
     NodeFilter.SHOW_ELEMENT,
     null

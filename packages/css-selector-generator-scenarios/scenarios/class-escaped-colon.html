@@ -1,8 +1,7 @@
-<!--
-  Class names containing characters that must be escaped in a selector.
-  The generated selector has to escape them AND still resolve back to the
-  element, which is what the old greedy comment splitter made impossible to
-  express: it split `expect: .aaa\:bbb` on the LAST colon.
+<!-- scenario
+title: Class containing a colon
+description: Characters that are special in a selector have to be escaped and still match.
+tags: class, escaping, gotcha
 -->
 
 <div class="aaa:bbb"><!-- expect: .aaa\:bbb --></div>
