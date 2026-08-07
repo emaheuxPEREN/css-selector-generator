@@ -88,7 +88,8 @@ export function parseAllComments(rootElement: Element): ScenarioExpectations {
   const elementsByIdentifier = createMapOfSets<string, Element>();
   const expectationsByIdentifier = createMapOfSets<string, string>();
 
-  const iterator = document.createNodeIterator(
+  // The root may belong to another document, e.g. an iframe.
+  const iterator = rootElement.ownerDocument.createNodeIterator(
     rootElement,
     NodeFilter.SHOW_COMMENT,
     { acceptNode: () => NodeFilter.FILTER_ACCEPT },

@@ -40,6 +40,8 @@ async function getTestEnvironment() {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
+  page.on("console", consoleMessageToTerminal);
+
   // inject test utilities
   await buildAndInsertScript(
     {
@@ -73,39 +75,52 @@ async function testScenario(
   scenarioContent: string,
   page: Page,
 ): Promise<ScenarioTestResult> {
-  page.on("console", consoleMessageToTerminal);
+  return page.evaluate(async (content: string) => {
+    // Written as a complete document through the HTML parser: fallback
+    // selectors encode the document structure, and declarative shadow DOM is
+    // only parsed this way.
+    const iframe = document.createElement("iframe");
+    iframe.srcdoc = `<!DOCTYPE html><html lang="en"><head></head><body>${content}</body></html>`;
+    const loaded = new Promise<void>((resolve) => {
+      iframe.addEventListener("load", () => {
+        resolve();
+      });
+    });
+    document.body.appendChild(iframe);
+    await loaded;
 
-  await page.setContent(`
-    <!DOCTYPE html>
-    <html lang="en">
-      <body>${scenarioContent}</body>
-    </html>
-  `);
+    const doc = iframe.contentDocument;
+    if (!doc) {
+      throw new Error("Could not access the scenario iframe document.");
+    }
 
-  return page.evaluate(() => {
-    const scenarioExpectations: ScenarioExpectations =
-      scenarioUtilities.parseAllComments(document.body);
+    try {
+      const scenarioExpectations: ScenarioExpectations =
+        scenarioUtilities.parseAllComments(doc.body);
 
-    const result: ScenarioTestResult = {
-      success: [],
-      error: [],
-    };
-    scenarioExpectations.forEach((targetElements, expectedSelector) => {
-      const elements = Array.from(targetElements);
-      const generatedSelector = CssSelectorGenerator.getCssSelector(
-        elements.length === 1 ? elements[0] : elements,
-      );
-      result[expectedSelector === generatedSelector ? "success" : "error"].push(
-        {
+      const result: ScenarioTestResult = {
+        success: [],
+        error: [],
+      };
+      scenarioExpectations.forEach((targetElements, expectedSelector) => {
+        const elements = Array.from(targetElements);
+        const generatedSelector = CssSelectorGenerator.getCssSelector(
+          elements.length === 1 ? elements[0] : elements,
+        );
+        result[
+          expectedSelector === generatedSelector ? "success" : "error"
+        ].push({
           expectation: expectedSelector,
           selector: generatedSelector,
           key: expectedSelector,
-        },
-      );
-    });
+        });
+      });
 
-    return result;
-  });
+      return result;
+    } finally {
+      iframe.remove();
+    }
+  }, scenarioContent);
 }
 
 interface BuildScriptProps {
