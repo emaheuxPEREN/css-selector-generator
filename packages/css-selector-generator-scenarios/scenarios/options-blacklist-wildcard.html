@@ -1,0 +1,9 @@
+<!-- scenario
+title: Blacklist with a wildcard
+description: A wildcard pattern removes matching class names from consideration.
+tags: options, blacklist
+options: {"blacklist": [".ignore-*"]}
+-->
+
+<div class="ignore-me keep"><!-- expect: .keep --></div>
+<div class="ignore-me other"></div>

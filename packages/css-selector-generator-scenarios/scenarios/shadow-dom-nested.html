@@ -1,0 +1,16 @@
+<!-- scenario
+title: Nested shadow roots
+description: A needle inside a shadow root nested in another shadow root.
+tags: shadow-dom, root
+-->
+
+<div>
+  <template shadowrootmode="open">
+    <div>
+      <template shadowrootmode="open">
+        <!-- root -->
+        <div class="deep"><!-- expect: .deep --></div>
+      </template>
+    </div>
+  </template>
+</div>

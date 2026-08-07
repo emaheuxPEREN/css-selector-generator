@@ -1,0 +1,8 @@
+<!-- scenario
+title: Duplicate ID
+description: The same id value on two elements identifies neither, so it must not be used.
+tags: id, gotcha
+-->
+
+<div id="dup"><!-- expect-not: #dup --></div>
+<div id="dup"></div>

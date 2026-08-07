@@ -1,0 +1,9 @@
+<!-- scenario
+title: Ignore generated class names
+description: A word-like class is preferred over a CSS-in-JS hash.
+tags: options, class
+options: {"ignoreGeneratedClassNames": true, "selectors": ["class", "id", "tag"]}
+-->
+
+<div class="container css-123abc"><!-- expect: .container --></div>
+<div class="other css-456def"></div>

@@ -1,0 +1,8 @@
+<!-- scenario
+title: Attribute name casing
+description: HTML lowercases attribute names, so the selector uses the lowercase form.
+tags: attribute, gotcha
+-->
+
+<div DATA-AAA="bbb"><!-- expect: [data-aaa] --></div>
+<div></div>

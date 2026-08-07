@@ -1,0 +1,7 @@
+<!-- scenario
+title: ID containing whitespace
+description: An id with a space cannot be expressed as one selector and must be skipped.
+tags: id, gotcha
+-->
+
+<div id="aaa bbb"><!-- expect: div --></div>

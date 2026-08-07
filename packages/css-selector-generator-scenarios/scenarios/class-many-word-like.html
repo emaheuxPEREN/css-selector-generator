@@ -1,0 +1,9 @@
+<!-- scenario
+title: Class shared by siblings needs a combination
+description: Neither class is unique alone, so they have to be combined.
+tags: class
+-->
+
+<div class="alpha beta"><!-- expect: .alpha.beta --></div>
+<div class="alpha gamma"></div>
+<div class="beta gamma"></div>

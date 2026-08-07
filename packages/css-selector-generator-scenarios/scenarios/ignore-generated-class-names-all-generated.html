@@ -1,0 +1,8 @@
+<!-- scenario
+title: Every class looks generated
+description: With nothing word-like left, the generator falls back past the class selector.
+tags: options, class, gotcha
+options: {"ignoreGeneratedClassNames": true}
+-->
+
+<span class="css-abc xyz"><!-- expect: span --></span>

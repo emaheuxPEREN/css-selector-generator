@@ -1,0 +1,9 @@
+<!-- scenario
+title: Whitelist priority
+description: A whitelisted selector is preferred even when another would also be unique.
+tags: options, whitelist
+options: {"whitelist": [".wanted"]}
+-->
+
+<div class="aaa wanted"><!-- expect: .wanted --></div>
+<div class="bbb"></div>

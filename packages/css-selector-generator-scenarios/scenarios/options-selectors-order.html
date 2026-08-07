@@ -1,0 +1,9 @@
+<!-- scenario
+title: Selector type priority
+description: Types are tried in the order given, so the tag wins over an equally unique class.
+tags: options, tag, class
+options: {"selectors": ["tag", "class"]}
+-->
+
+<p class="aaa"><!-- expect: p --></p>
+<div class="bbb"></div>

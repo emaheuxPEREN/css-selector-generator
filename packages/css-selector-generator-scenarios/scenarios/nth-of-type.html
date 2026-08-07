@@ -1,0 +1,13 @@
+<!-- scenario
+title: nth-of-type distinguishes same-tag siblings
+description: Among siblings of mixed tags, nth-of-type counts only the matching tag.
+tags: nthoftype
+options: {"selectors": ["nthoftype"]}
+-->
+
+<div>
+  <!-- root -->
+  <p></p>
+  <span></span>
+  <p><!-- expect: p:nth-of-type(2) --></p>
+</div>

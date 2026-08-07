@@ -1,0 +1,11 @@
+<!-- scenario
+title: Group of elements needing escaping
+description: A selector for several elements must escape each part and still match all of them.
+tags: class, escaping, gotcha
+-->
+
+<div class="aaa:bbb"><!-- identifier: needle --></div>
+<div class="ccc+ddd"><!-- identifier: needle --></div>
+<div class="other"></div>
+
+<!-- expect: needle; .aaa\:bbb, .ccc\+ddd -->

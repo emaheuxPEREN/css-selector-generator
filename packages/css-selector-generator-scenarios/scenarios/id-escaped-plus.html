@@ -1,0 +1,7 @@
+<!-- scenario
+title: ID containing a plus sign
+description: A plus sign in an id must be escaped, otherwise it reads as a combinator.
+tags: id, escaping, gotcha
+-->
+
+<div id="aaa+bbb"><!-- expect: #aaa\+bbb --></div>

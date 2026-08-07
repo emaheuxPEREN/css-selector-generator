@@ -1,0 +1,7 @@
+<!-- scenario
+title: ID starting with a digit
+description: An identifier cannot start with a digit, so it is escaped as a code point.
+tags: id, escaping, gotcha
+-->
+
+<div id="1aaa"><!-- expect: #\31 aaa --></div>

@@ -1,0 +1,7 @@
+<!-- scenario
+title: ID containing a colon
+description: A colon in an id must be escaped, otherwise it reads as a pseudo-class.
+tags: id, escaping, gotcha
+-->
+
+<div id="aaa:bbb"><!-- expect: #aaa\:bbb --></div>

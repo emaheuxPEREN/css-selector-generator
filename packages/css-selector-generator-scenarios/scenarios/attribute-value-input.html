@@ -1,0 +1,8 @@
+<!-- scenario
+title: Value attribute on an input
+description: The value attribute changes as the user types, so it must not be used.
+tags: attribute, gotcha
+-->
+
+<input value="aaa"><!-- expect-not: [value='aaa'] -->
+<input value="bbb">

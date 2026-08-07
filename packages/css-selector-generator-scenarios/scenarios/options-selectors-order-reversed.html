@@ -1,0 +1,9 @@
+<!-- scenario
+title: Selector type priority reversed
+description: The same markup with the order flipped picks the class instead of the tag.
+tags: options, tag, class
+options: {"selectors": ["class", "tag"]}
+-->
+
+<p class="aaa"><!-- expect: .aaa --></p>
+<div class="bbb"></div>

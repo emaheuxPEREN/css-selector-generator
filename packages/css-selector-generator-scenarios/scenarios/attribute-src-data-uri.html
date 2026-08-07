@@ -1,0 +1,8 @@
+<!-- scenario
+title: Data URI in a src attribute
+description: A data URI can be enormous, so it must not become part of a selector.
+tags: attribute, gotcha
+-->
+
+<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw="><!-- expect-not: [src='data:image/gif;base64,R0lGODlhAQABAAAAACw='] -->
+<img src="other.gif">

@@ -1,0 +1,13 @@
+<!-- scenario
+title: Ancestor needed several levels up
+description: The nearest distinguishing ancestor may be far from the element.
+tags: class
+-->
+
+<div class="left">
+  <div><div><div class="target"><!-- expect: .left .target --></div></div></div>
+</div>
+
+<div class="right">
+  <div><div><div class="target"></div></div></div>
+</div>

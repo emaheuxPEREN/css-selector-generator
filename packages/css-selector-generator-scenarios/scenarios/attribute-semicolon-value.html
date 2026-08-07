@@ -1,0 +1,8 @@
+<!-- scenario
+title: Attribute value containing a semicolon
+description: A semicolon in the expected selector must not be read as a group divider.
+tags: attribute, escaping, gotcha
+-->
+
+<div data-aaa="bbb;ccc"><!-- expect: [data-aaa='bbb\;ccc'] --></div>
+<div data-aaa="other"></div>

@@ -1,0 +1,9 @@
+<!-- scenario
+title: nth-child alone is rarely unique
+description: :nth-child(1) also matches HTML and HEAD, so it cannot identify a first child on its own.
+tags: nthchild, fallback, gotcha
+options: {"selectors": ["nthchild"]}
+-->
+
+<div><!-- expect-not: :nth-child(1) --></div>
+<div></div>

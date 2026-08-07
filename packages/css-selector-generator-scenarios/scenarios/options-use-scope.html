@@ -1,0 +1,11 @@
+<!-- scenario
+title: Option useScope
+description: With a root and useScope, the fallback selector is scoped instead of rooted at the document.
+tags: options, root, fallback
+options: {"useScope": true}
+-->
+
+<div><!-- root -->
+  <div><!-- expect: :scope > :nth-child(1) --></div>
+  <div></div>
+</div>

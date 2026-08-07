@@ -1,0 +1,8 @@
+<!-- scenario
+title: Attribute value containing a URL
+description: Colons and slashes inside an attribute value must survive intact.
+tags: attribute, escaping, gotcha
+-->
+
+<a href="http://example.com/a?b=c"><!-- expect: [href='http\:\/\/example\.com\/a\?b\=c'] --></a>
+<a href="http://example.com/other"></a>

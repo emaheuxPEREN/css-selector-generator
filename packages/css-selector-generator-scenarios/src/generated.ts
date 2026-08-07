@@ -11,12 +11,69 @@ export const scenarios: Scenario[] = [
     "html": "<div class=\"aaa\">\n  <div class=\"bbb\">\n    <!-- expect: .aaa .bbb -->\n  </div>\n</div>\n\n<div class=\"ccc\">\n  <!-- this prevents creation of simple .bbb selector -->\n  <div class=\"bbb\"></div>\n</div>\n"
   },
   {
+    "id": "attribute-semicolon-value",
+    "title": "Attribute value containing a semicolon",
+    "description": "A semicolon in the expected selector must not be read as a group divider.",
+    "tags": [
+      "attribute",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Attribute value containing a semicolon\ndescription: A semicolon in the expected selector must not be read as a group divider.\ntags: attribute, escaping, gotcha\n-->\n\n<div data-aaa=\"bbb;ccc\"><!-- expect: [data-aaa='bbb\\;ccc'] --></div>\n<div data-aaa=\"other\"></div>\n"
+  },
+  {
+    "id": "attribute-src-data-uri",
+    "title": "Data URI in a src attribute",
+    "description": "A data URI can be enormous, so it must not become part of a selector.",
+    "tags": [
+      "attribute",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Data URI in a src attribute\ndescription: A data URI can be enormous, so it must not become part of a selector.\ntags: attribute, gotcha\n-->\n\n<img src=\"data:image/gif;base64,R0lGODlhAQABAAAAACw=\"><!-- expect-not: [src='data:image/gif;base64,R0lGODlhAQABAAAAACw='] -->\n<img src=\"other.gif\">\n"
+  },
+  {
+    "id": "attribute-url-value",
+    "title": "Attribute value containing a URL",
+    "description": "Colons and slashes inside an attribute value must survive intact.",
+    "tags": [
+      "attribute",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Attribute value containing a URL\ndescription: Colons and slashes inside an attribute value must survive intact.\ntags: attribute, escaping, gotcha\n-->\n\n<a href=\"http://example.com/a?b=c\"><!-- expect: [href='http\\:\\/\\/example\\.com\\/a\\?b\\=c'] --></a>\n<a href=\"http://example.com/other\"></a>\n"
+  },
+  {
+    "id": "attribute-value-input",
+    "title": "Value attribute on an input",
+    "description": "The value attribute changes as the user types, so it must not be used.",
+    "tags": [
+      "attribute",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Value attribute on an input\ndescription: The value attribute changes as the user types, so it must not be used.\ntags: attribute, gotcha\n-->\n\n<input value=\"aaa\"><!-- expect-not: [value='aaa'] -->\n<input value=\"bbb\">\n"
+  },
+  {
     "id": "class-combination",
     "title": null,
     "description": null,
     "tags": [],
     "options": {},
     "html": "<div class=\"aaa bbb\"><!-- expect: .aaa.bbb --></div>\n<div class=\"aaa ccc\"></div>\n<div class=\"bbb ccc\"></div>\n"
+  },
+  {
+    "id": "class-empty",
+    "title": "Empty class attribute",
+    "description": "An empty class attribute must not produce a class selector.",
+    "tags": [
+      "class",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Empty class attribute\ndescription: An empty class attribute must not produce a class selector.\ntags: class, gotcha\n-->\n\n<div class=\"\"><!-- expect: div --></div>\n"
   },
   {
     "id": "class-escaped-colon",
@@ -27,6 +84,28 @@ export const scenarios: Scenario[] = [
     "html": "<!--\n  Class names containing characters that must be escaped in a selector.\n  The generated selector has to escape them AND still resolve back to the\n  element, which is what the old greedy comment splitter made impossible to\n  express: it split `expect: .aaa\\:bbb` on the LAST colon.\n-->\n\n<div class=\"aaa:bbb\"><!-- expect: .aaa\\:bbb --></div>\n\n<div class=\"ccc+ddd\"><!-- expect: .ccc\\+ddd --></div>\n"
   },
   {
+    "id": "class-leading-digit",
+    "title": "Class starting with a digit",
+    "description": "A class name cannot start with a digit, so it is escaped as a code point.",
+    "tags": [
+      "class",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Class starting with a digit\ndescription: A class name cannot start with a digit, so it is escaped as a code point.\ntags: class, escaping, gotcha\n-->\n\n<div class=\"1aaa\"><!-- expect: .\\31 aaa --></div>\n<div class=\"other\"></div>\n"
+  },
+  {
+    "id": "class-many-word-like",
+    "title": "Class shared by siblings needs a combination",
+    "description": "Neither class is unique alone, so they have to be combined.",
+    "tags": [
+      "class"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Class shared by siblings needs a combination\ndescription: Neither class is unique alone, so they have to be combined.\ntags: class\n-->\n\n<div class=\"alpha beta\"><!-- expect: .alpha.beta --></div>\n<div class=\"alpha gamma\"></div>\n<div class=\"beta gamma\"></div>\n"
+  },
+  {
     "id": "class-single",
     "title": null,
     "description": null,
@@ -35,12 +114,148 @@ export const scenarios: Scenario[] = [
     "html": "<div class=\"aaa bbb\"><!-- expect: .bbb --></div>\n<div class=\"aaa ccc\"></div>\n"
   },
   {
+    "id": "class-whitespace-only",
+    "title": "Class attribute of only whitespace",
+    "description": "Whitespace-only class attributes must not produce empty class selectors.",
+    "tags": [
+      "class",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Class attribute of only whitespace\ndescription: Whitespace-only class attributes must not produce empty class selectors.\ntags: class, gotcha\n-->\n\n<div class=\"   \"><!-- expect: div --></div>\n"
+  },
+  {
+    "id": "deep-nesting-descendant",
+    "title": "Ancestor needed several levels up",
+    "description": "The nearest distinguishing ancestor may be far from the element.",
+    "tags": [
+      "class"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Ancestor needed several levels up\ndescription: The nearest distinguishing ancestor may be far from the element.\ntags: class\n-->\n\n<div class=\"left\">\n  <div><div><div class=\"target\"><!-- expect: .left .target --></div></div></div>\n</div>\n\n<div class=\"right\">\n  <div><div><div class=\"target\"></div></div></div>\n</div>\n"
+  },
+  {
     "id": "deep-selector",
     "title": null,
     "description": null,
     "tags": [],
     "options": {},
     "html": "<div id=\"aaa\" class=\"aaa\">\n  <div>\n    <div class=\"aaa\"><!-- expect:  #aaa .aaa --></div>\n  </div>\n</div>\n"
+  },
+  {
+    "id": "id-duplicate",
+    "title": "Duplicate ID",
+    "description": "The same id value on two elements identifies neither, so it must not be used.",
+    "tags": [
+      "id",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Duplicate ID\ndescription: The same id value on two elements identifies neither, so it must not be used.\ntags: id, gotcha\n-->\n\n<div id=\"dup\"><!-- expect-not: #dup --></div>\n<div id=\"dup\"></div>\n"
+  },
+  {
+    "id": "id-empty",
+    "title": "Empty ID attribute",
+    "description": "An empty id is not usable and must be skipped.",
+    "tags": [
+      "id",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Empty ID attribute\ndescription: An empty id is not usable and must be skipped.\ntags: id, gotcha\n-->\n\n<div id=\"\"><!-- expect: div --></div>\n"
+  },
+  {
+    "id": "id-escaped-colon",
+    "title": "ID containing a colon",
+    "description": "A colon in an id must be escaped, otherwise it reads as a pseudo-class.",
+    "tags": [
+      "id",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: ID containing a colon\ndescription: A colon in an id must be escaped, otherwise it reads as a pseudo-class.\ntags: id, escaping, gotcha\n-->\n\n<div id=\"aaa:bbb\"><!-- expect: #aaa\\:bbb --></div>\n"
+  },
+  {
+    "id": "id-escaped-plus",
+    "title": "ID containing a plus sign",
+    "description": "A plus sign in an id must be escaped, otherwise it reads as a combinator.",
+    "tags": [
+      "id",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: ID containing a plus sign\ndescription: A plus sign in an id must be escaped, otherwise it reads as a combinator.\ntags: id, escaping, gotcha\n-->\n\n<div id=\"aaa+bbb\"><!-- expect: #aaa\\+bbb --></div>\n"
+  },
+  {
+    "id": "id-leading-digit",
+    "title": "ID starting with a digit",
+    "description": "An identifier cannot start with a digit, so it is escaped as a code point.",
+    "tags": [
+      "id",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: ID starting with a digit\ndescription: An identifier cannot start with a digit, so it is escaped as a code point.\ntags: id, escaping, gotcha\n-->\n\n<div id=\"1aaa\"><!-- expect: #\\31 aaa --></div>\n"
+  },
+  {
+    "id": "id-whitespace",
+    "title": "ID containing whitespace",
+    "description": "An id with a space cannot be expressed as one selector and must be skipped.",
+    "tags": [
+      "id",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: ID containing whitespace\ndescription: An id with a space cannot be expressed as one selector and must be skipped.\ntags: id, gotcha\n-->\n\n<div id=\"aaa bbb\"><!-- expect: div --></div>\n"
+  },
+  {
+    "id": "ignore-generated-class-names-all-generated",
+    "title": "Every class looks generated",
+    "description": "With nothing word-like left, the generator falls back past the class selector.",
+    "tags": [
+      "options",
+      "class",
+      "gotcha"
+    ],
+    "options": {
+      "ignoreGeneratedClassNames": true
+    },
+    "html": "<!-- scenario\ntitle: Every class looks generated\ndescription: With nothing word-like left, the generator falls back past the class selector.\ntags: options, class, gotcha\noptions: {\"ignoreGeneratedClassNames\": true}\n-->\n\n<span class=\"css-abc xyz\"><!-- expect: span --></span>\n"
+  },
+  {
+    "id": "ignore-generated-class-names-mixed",
+    "title": "Generated class names from several libraries",
+    "description": "styled-components and MUI prefixes are both recognised as generated.",
+    "tags": [
+      "options",
+      "class",
+      "gotcha"
+    ],
+    "options": {
+      "ignoreGeneratedClassNames": true
+    },
+    "html": "<!-- scenario\ntitle: Generated class names from several libraries\ndescription: styled-components and MUI prefixes are both recognised as generated.\ntags: options, class, gotcha\noptions: {\"ignoreGeneratedClassNames\": true}\n-->\n\n<div class=\"sc-xyz button-primary makeStyles-123\"><!-- expect: .button-primary --></div>\n"
+  },
+  {
+    "id": "ignore-generated-class-names",
+    "title": "Ignore generated class names",
+    "description": "A word-like class is preferred over a CSS-in-JS hash.",
+    "tags": [
+      "options",
+      "class"
+    ],
+    "options": {
+      "ignoreGeneratedClassNames": true,
+      "selectors": [
+        "class",
+        "id",
+        "tag"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: Ignore generated class names\ndescription: A word-like class is preferred over a CSS-in-JS hash.\ntags: options, class\noptions: {\"ignoreGeneratedClassNames\": true, \"selectors\": [\"class\", \"id\", \"tag\"]}\n-->\n\n<div class=\"container css-123abc\"><!-- expect: .container --></div>\n<div class=\"other css-456def\"></div>\n"
   },
   {
     "id": "multiple-classes",
@@ -57,6 +272,18 @@ export const scenarios: Scenario[] = [
     "tags": [],
     "options": {},
     "html": "<div><!-- identifier: needle --></div>\n<p><!-- identifier: needle --></p>\n\n<!-- expect: needle; div, p -->\n"
+  },
+  {
+    "id": "multiple-elements-escaped",
+    "title": "Group of elements needing escaping",
+    "description": "A selector for several elements must escape each part and still match all of them.",
+    "tags": [
+      "class",
+      "escaping",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Group of elements needing escaping\ndescription: A selector for several elements must escape each part and still match all of them.\ntags: class, escaping, gotcha\n-->\n\n<div class=\"aaa:bbb\"><!-- identifier: needle --></div>\n<div class=\"ccc+ddd\"><!-- identifier: needle --></div>\n<div class=\"other\"></div>\n\n<!-- expect: needle; .aaa\\:bbb, .ccc\\+ddd -->\n"
   },
   {
     "id": "multiple-elements-fallback",
@@ -99,6 +326,69 @@ export const scenarios: Scenario[] = [
     "html": "<div class=\"aaa\"><!-- identifier: needle --></div>\n<div class=\"aaa\"><!-- identifier: needle --></div>\n<div class=\"aaa\"><!-- identifier: needle --></div>\n\n<!-- expect: needle; .aaa -->\n"
   },
   {
+    "id": "nth-child-not-unique-alone",
+    "title": "nth-child alone is rarely unique",
+    "description": ":nth-child(1) also matches HTML and HEAD, so it cannot identify a first child on its own.",
+    "tags": [
+      "nthchild",
+      "fallback",
+      "gotcha"
+    ],
+    "options": {
+      "selectors": [
+        "nthchild"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: nth-child alone is rarely unique\ndescription: :nth-child(1) also matches HTML and HEAD, so it cannot identify a first child on its own.\ntags: nthchild, fallback, gotcha\noptions: {\"selectors\": [\"nthchild\"]}\n-->\n\n<div><!-- expect-not: :nth-child(1) --></div>\n<div></div>\n"
+  },
+  {
+    "id": "nth-of-type",
+    "title": "nth-of-type distinguishes same-tag siblings",
+    "description": "Among siblings of mixed tags, nth-of-type counts only the matching tag.",
+    "tags": [
+      "nthoftype"
+    ],
+    "options": {
+      "selectors": [
+        "nthoftype"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: nth-of-type distinguishes same-tag siblings\ndescription: Among siblings of mixed tags, nth-of-type counts only the matching tag.\ntags: nthoftype\noptions: {\"selectors\": [\"nthoftype\"]}\n-->\n\n<div>\n  <!-- root -->\n  <p></p>\n  <span></span>\n  <p><!-- expect: p:nth-of-type(2) --></p>\n</div>\n"
+  },
+  {
+    "id": "options-blacklist-wildcard",
+    "title": "Blacklist with a wildcard",
+    "description": "A wildcard pattern removes matching class names from consideration.",
+    "tags": [
+      "options",
+      "blacklist"
+    ],
+    "options": {
+      "blacklist": [
+        ".ignore-*"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: Blacklist with a wildcard\ndescription: A wildcard pattern removes matching class names from consideration.\ntags: options, blacklist\noptions: {\"blacklist\": [\".ignore-*\"]}\n-->\n\n<div class=\"ignore-me keep\"><!-- expect: .keep --></div>\n<div class=\"ignore-me other\"></div>\n"
+  },
+  {
+    "id": "options-combine-between-selectors",
+    "title": "Option combineBetweenSelectors disabled",
+    "description": "With combining across types disabled, a tag and a class must not be merged.",
+    "tags": [
+      "options",
+      "class",
+      "tag"
+    ],
+    "options": {
+      "combineBetweenSelectors": false,
+      "selectors": [
+        "tag",
+        "class"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: Option combineBetweenSelectors disabled\ndescription: With combining across types disabled, a tag and a class must not be merged.\ntags: options, class, tag\noptions: {\"combineBetweenSelectors\": false, \"selectors\": [\"tag\", \"class\"]}\n-->\n\n<div class=\"aaa\"><!-- expect-not: div.aaa --></div>\n<p class=\"aaa\"></p>\n"
+  },
+  {
     "id": "options-combine-within-selector",
     "title": "Option combineWithinSelector disabled",
     "description": "With combining disabled, two class names must not be merged into one selector.",
@@ -137,6 +427,69 @@ export const scenarios: Scenario[] = [
     ],
     "options": {},
     "html": "<!-- scenario\ntitle: Option root\ndescription: Only the marked root is searched, so the span outside it is not a conflict.\ntags: options, root\n-->\n\n<span></span>\n\n<div><!-- root -->\n  <span><!-- expect: span --></span>\n</div>\n"
+  },
+  {
+    "id": "options-selectors-order-reversed",
+    "title": "Selector type priority reversed",
+    "description": "The same markup with the order flipped picks the class instead of the tag.",
+    "tags": [
+      "options",
+      "tag",
+      "class"
+    ],
+    "options": {
+      "selectors": [
+        "class",
+        "tag"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: Selector type priority reversed\ndescription: The same markup with the order flipped picks the class instead of the tag.\ntags: options, tag, class\noptions: {\"selectors\": [\"class\", \"tag\"]}\n-->\n\n<p class=\"aaa\"><!-- expect: .aaa --></p>\n<div class=\"bbb\"></div>\n"
+  },
+  {
+    "id": "options-selectors-order",
+    "title": "Selector type priority",
+    "description": "Types are tried in the order given, so the tag wins over an equally unique class.",
+    "tags": [
+      "options",
+      "tag",
+      "class"
+    ],
+    "options": {
+      "selectors": [
+        "tag",
+        "class"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: Selector type priority\ndescription: Types are tried in the order given, so the tag wins over an equally unique class.\ntags: options, tag, class\noptions: {\"selectors\": [\"tag\", \"class\"]}\n-->\n\n<p class=\"aaa\"><!-- expect: p --></p>\n<div class=\"bbb\"></div>\n"
+  },
+  {
+    "id": "options-use-scope",
+    "title": "Option useScope",
+    "description": "With a root and useScope, the fallback selector is scoped instead of rooted at the document.",
+    "tags": [
+      "options",
+      "root",
+      "fallback"
+    ],
+    "options": {
+      "useScope": true
+    },
+    "html": "<!-- scenario\ntitle: Option useScope\ndescription: With a root and useScope, the fallback selector is scoped instead of rooted at the document.\ntags: options, root, fallback\noptions: {\"useScope\": true}\n-->\n\n<div><!-- root -->\n  <div><!-- expect: :scope > :nth-child(1) --></div>\n  <div></div>\n</div>\n"
+  },
+  {
+    "id": "options-whitelist-priority",
+    "title": "Whitelist priority",
+    "description": "A whitelisted selector is preferred even when another would also be unique.",
+    "tags": [
+      "options",
+      "whitelist"
+    ],
+    "options": {
+      "whitelist": [
+        ".wanted"
+      ]
+    },
+    "html": "<!-- scenario\ntitle: Whitelist priority\ndescription: A whitelisted selector is preferred even when another would also be unique.\ntags: options, whitelist\noptions: {\"whitelist\": [\".wanted\"]}\n-->\n\n<div class=\"aaa wanted\"><!-- expect: .wanted --></div>\n<div class=\"bbb\"></div>\n"
   },
   {
     "id": "selector-class",
@@ -192,6 +545,28 @@ export const scenarios: Scenario[] = [
     ],
     "options": {},
     "html": "<!-- scenario\ntitle: Shadow DOM fallback\ndescription: Children of a shadow root with nothing to identify them fall back to a scoped positional selector.\ntags: shadow-dom, root, fallback\n-->\n\n<div>\n  <template shadowrootmode=\"open\">\n    <!-- root -->\n    <div><!-- expect: :nth-child(1) --></div>\n    <div></div>\n  </template>\n</div>\n"
+  },
+  {
+    "id": "shadow-dom-nested",
+    "title": "Nested shadow roots",
+    "description": "A needle inside a shadow root nested in another shadow root.",
+    "tags": [
+      "shadow-dom",
+      "root"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Nested shadow roots\ndescription: A needle inside a shadow root nested in another shadow root.\ntags: shadow-dom, root\n-->\n\n<div>\n  <template shadowrootmode=\"open\">\n    <div>\n      <template shadowrootmode=\"open\">\n        <!-- root -->\n        <div class=\"deep\"><!-- expect: .deep --></div>\n      </template>\n    </div>\n  </template>\n</div>\n"
+  },
+  {
+    "id": "tag-uppercase-attribute",
+    "title": "Attribute name casing",
+    "description": "HTML lowercases attribute names, so the selector uses the lowercase form.",
+    "tags": [
+      "attribute",
+      "gotcha"
+    ],
+    "options": {},
+    "html": "<!-- scenario\ntitle: Attribute name casing\ndescription: HTML lowercases attribute names, so the selector uses the lowercase form.\ntags: attribute, gotcha\n-->\n\n<div DATA-AAA=\"bbb\"><!-- expect: [data-aaa] --></div>\n<div></div>\n"
   },
   {
     "id": "tag",

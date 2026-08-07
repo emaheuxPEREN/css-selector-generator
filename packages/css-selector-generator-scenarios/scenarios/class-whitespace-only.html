@@ -1,0 +1,7 @@
+<!-- scenario
+title: Class attribute of only whitespace
+description: Whitespace-only class attributes must not produce empty class selectors.
+tags: class, gotcha
+-->
+
+<div class="   "><!-- expect: div --></div>

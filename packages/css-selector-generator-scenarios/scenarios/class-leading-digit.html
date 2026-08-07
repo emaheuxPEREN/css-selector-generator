@@ -1,0 +1,8 @@
+<!-- scenario
+title: Class starting with a digit
+description: A class name cannot start with a digit, so it is escaped as a code point.
+tags: class, escaping, gotcha
+-->
+
+<div class="1aaa"><!-- expect: .\31 aaa --></div>
+<div class="other"></div>

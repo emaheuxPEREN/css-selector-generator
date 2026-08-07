@@ -1,0 +1,9 @@
+<!-- scenario
+title: Option combineBetweenSelectors disabled
+description: With combining across types disabled, a tag and a class must not be merged.
+tags: options, class, tag
+options: {"combineBetweenSelectors": false, "selectors": ["tag", "class"]}
+-->
+
+<div class="aaa"><!-- expect-not: div.aaa --></div>
+<p class="aaa"></p>

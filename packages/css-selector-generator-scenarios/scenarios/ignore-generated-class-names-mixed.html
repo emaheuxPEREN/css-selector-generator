@@ -1,0 +1,8 @@
+<!-- scenario
+title: Generated class names from several libraries
+description: styled-components and MUI prefixes are both recognised as generated.
+tags: options, class, gotcha
+options: {"ignoreGeneratedClassNames": true}
+-->
+
+<div class="sc-xyz button-primary makeStyles-123"><!-- expect: .button-primary --></div>
