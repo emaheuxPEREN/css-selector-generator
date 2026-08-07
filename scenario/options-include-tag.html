@@ -1,0 +1,10 @@
+<!-- scenario
+title: Option includeTag
+description: With includeTag, every part of the selector is prefixed with its tag name.
+tags: options, tag
+options: {"includeTag": true, "selectors": ["class"]}
+-->
+
+<div class="aaa bbb">
+  <div class="aaa"><!-- expect: div.bbb div.aaa --></div>
+</div>

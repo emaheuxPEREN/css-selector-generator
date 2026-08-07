@@ -2,6 +2,7 @@ import { assert } from "chai";
 import {
   parseComment,
   parseCommentContent,
+  parseFrontMatterContent,
   parseScenario,
 } from "./scenario-utilities.js";
 
@@ -129,17 +130,92 @@ describe("Scenario Utilities", () => {
     });
   });
 
+  describe("parseFrontMatterContent", () => {
+    it("should ignore a comment that is not front matter", () => {
+      assert.equal(parseFrontMatterContent("expect: .aaa"), null);
+    });
+
+    it("should ignore a comment merely mentioning scenario", () => {
+      assert.equal(parseFrontMatterContent("scenario stuff\ntitle: x"), null);
+    });
+
+    it("should parse all supported keys", () => {
+      const result = parseFrontMatterContent(
+        "\nscenario\ntitle: Mock title\ndescription: Mock description\ntags: aaa, bbb\noptions: {\"includeTag\": true}\n",
+      );
+      assert.deepEqual(result, {
+        title: "Mock title",
+        description: "Mock description",
+        tags: ["aaa", "bbb"],
+        options: { includeTag: true },
+      });
+    });
+
+    it("should default missing keys", () => {
+      const result = parseFrontMatterContent("scenario");
+      assert.deepEqual(result, {
+        title: null,
+        description: null,
+        tags: [],
+        options: {},
+      });
+    });
+
+    it("should keep a colon inside a description", () => {
+      const result = parseFrontMatterContent(
+        "scenario\ndescription: Two elements: one id",
+      );
+      assert.equal(result.description, "Two elements: one id");
+    });
+
+    it("should throw on invalid options JSON", () => {
+      assert.throws(
+        () => parseFrontMatterContent("scenario\noptions: {nope}"),
+        /invalid JSON/,
+      );
+    });
+  });
+
   describe("parseScenario", () => {
+    it("should read front matter from the first comment", () => {
+      rootElement.innerHTML = `
+        <!--
+          scenario
+          title: Mock title
+          options: {"includeTag": true}
+        -->
+        <div id="mockId"><!-- expect: #mockId --></div>
+      `;
+      const result = parseScenario(rootElement);
+      assert.equal(result.metadata.title, "Mock title");
+      assert.deepEqual(result.metadata.options, { includeTag: true });
+      assert.lengthOf(result.expectations, 1);
+    });
+
+    it("should not read front matter from a later comment", () => {
+      rootElement.innerHTML = `
+        <div id="mockId"><!-- expect: #mockId --></div>
+        <!--
+          scenario
+          title: Mock title
+        -->
+      `;
+      const result = parseScenario(rootElement);
+      assert.equal(result.metadata.title, null);
+    });
+
     it("should return empty if there are no comments", () => {
       rootElement.innerHTML = "<div></div>";
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, { needles: [], expectations: [] });
+      assert.deepEqual(result.needles, []);
+      assert.deepEqual(result.expectations, []);
     });
 
     it("should return empty if there are no matching comments", () => {
       rootElement.innerHTML = "<div><!-- some comment --></div>";
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, { needles: [], expectations: [] });
+      assert.deepEqual(result.needles, []);
+      assert.deepEqual(result.expectations, []);
     });
 
     it("should associate an inline expectation with its element", () => {
@@ -147,12 +223,12 @@ describe("Scenario Utilities", () => {
         <div id="mockId"><!-- expect: #mockId --></div>
       `;
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, {
-        needles: [
-          { id: "#0", elements: [rootElement.querySelector("#mockId")] },
-        ],
-        expectations: [{ needleId: "#0", selector: "#mockId" }],
-      });
+      assert.deepEqual(result.needles, [
+        { id: "#0", elements: [rootElement.querySelector("#mockId")] },
+      ]);
+      assert.deepEqual(result.expectations, [
+        { needleId: "#0", selector: "#mockId" },
+      ]);
     });
 
     it("should keep a needle that has an identifier but no expectation", () => {
@@ -160,15 +236,10 @@ describe("Scenario Utilities", () => {
         <div id="mockId"><!-- identifier: mockElement --></div>
       `;
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, {
-        needles: [
-          {
-            id: "mockElement",
-            elements: [rootElement.querySelector("#mockId")],
-          },
-        ],
-        expectations: [],
-      });
+      assert.deepEqual(result.needles, [
+        { id: "mockElement", elements: [rootElement.querySelector("#mockId")] },
+      ]);
+      assert.deepEqual(result.expectations, []);
     });
 
     it("should bind a group expectation to its identifier", () => {
@@ -177,15 +248,12 @@ describe("Scenario Utilities", () => {
         <!-- expect: mockElement; #mockId -->
       `;
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, {
-        needles: [
-          {
-            id: "mockElement",
-            elements: [rootElement.querySelector("#mockId")],
-          },
-        ],
-        expectations: [{ needleId: "mockElement", selector: "#mockId" }],
-      });
+      assert.deepEqual(result.needles, [
+        { id: "mockElement", elements: [rootElement.querySelector("#mockId")] },
+      ]);
+      assert.deepEqual(result.expectations, [
+        { needleId: "mockElement", selector: "#mockId" },
+      ]);
     });
 
     it("should keep separate needles for separate inline expectations", () => {
@@ -194,16 +262,14 @@ describe("Scenario Utilities", () => {
         <div id="secondMockId"><!-- expect: #secondMockId --></div>
       `;
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, {
-        needles: [
-          { id: "#0", elements: [rootElement.querySelector("#firstMockId")] },
-          { id: "#1", elements: [rootElement.querySelector("#secondMockId")] },
-        ],
-        expectations: [
-          { needleId: "#0", selector: "#firstMockId" },
-          { needleId: "#1", selector: "#secondMockId" },
-        ],
-      });
+      assert.deepEqual(result.needles, [
+        { id: "#0", elements: [rootElement.querySelector("#firstMockId")] },
+        { id: "#1", elements: [rootElement.querySelector("#secondMockId")] },
+      ]);
+      assert.deepEqual(result.expectations, [
+        { needleId: "#0", selector: "#firstMockId" },
+        { needleId: "#1", selector: "#secondMockId" },
+      ]);
     });
 
     it("should not merge distinct elements sharing an expected selector", () => {
@@ -226,24 +292,24 @@ describe("Scenario Utilities", () => {
         <!-- expect: mockElement; .mockClass -->
       `;
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, {
-        needles: [
-          {
-            id: "mockElement",
-            elements: [...rootElement.querySelectorAll(".mockClass")],
-          },
-        ],
-        expectations: [{ needleId: "mockElement", selector: ".mockClass" }],
-      });
+      assert.deepEqual(result.needles, [
+        {
+          id: "mockElement",
+          elements: [...rootElement.querySelectorAll(".mockClass")],
+        },
+      ]);
+      assert.deepEqual(result.expectations, [
+        { needleId: "mockElement", selector: ".mockClass" },
+      ]);
     });
 
     it("should keep an expectation whose identifier was never applied", () => {
       rootElement.innerHTML = `<!-- expect: missing; .mockClass -->`;
       const result = parseScenario(rootElement);
-      assert.deepEqual(result, {
-        needles: [],
-        expectations: [{ needleId: "missing", selector: ".mockClass" }],
-      });
+      assert.deepEqual(result.needles, []);
+      assert.deepEqual(result.expectations, [
+        { needleId: "missing", selector: ".mockClass" },
+      ]);
     });
   });
 });

@@ -120,6 +120,7 @@ async function testScenario(
         const { elements } = needle;
         const generatedSelector = CssSelectorGenerator.getCssSelector(
           elements.length === 1 ? elements[0] : elements,
+          scenario.metadata.options,
         );
         result[selector === generatedSelector ? "success" : "error"].push({
           expectation: selector,

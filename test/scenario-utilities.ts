@@ -1,3 +1,5 @@
+import type { CssSelectorGeneratorOptionsInput } from "../src/types.js";
+
 // Keys are bare identifiers, so that a value may itself contain the divider
 // character. A greedy key would split on the LAST divider instead, which
 // breaks escaped selectors (`.aaa\:bbb`) and attribute values holding URLs
@@ -49,6 +51,59 @@ export function parseComment(comment: Comment): ScenarioExpectationItem | null {
   return null;
 }
 
+export interface ScenarioMetadata {
+  title: string | null;
+  description: string | null;
+  tags: string[];
+  options: CssSelectorGeneratorOptionsInput;
+}
+
+function emptyMetadata(): ScenarioMetadata {
+  return { title: null, description: null, tags: [], options: {} };
+}
+
+/**
+ * Front matter is a comment whose first line is the bare word `scenario`,
+ * followed by `key: value` lines. Only the scenario's first comment is
+ * considered.
+ */
+export function parseFrontMatterContent(
+  content: string,
+): ScenarioMetadata | null {
+  const lines = content.split("\n");
+  const firstLine = lines.findIndex((line) => line.trim() !== "");
+  if (firstLine === -1 || lines[firstLine].trim() !== "scenario") {
+    return null;
+  }
+
+  const metadata = emptyMetadata();
+
+  lines.slice(firstLine + 1).forEach((line) => {
+    const [key, val] = splitContent(line, COMMENT_SPLITTER);
+    if (key === "title") {
+      metadata.title = val;
+    }
+    if (key === "description") {
+      metadata.description = val;
+    }
+    if (key === "tags") {
+      metadata.tags = val
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== "");
+    }
+    if (key === "options") {
+      try {
+        metadata.options = JSON.parse(val) as CssSelectorGeneratorOptionsInput;
+      } catch {
+        throw new Error(`Scenario has invalid JSON in "options": ${val}`);
+      }
+    }
+  });
+
+  return metadata;
+}
+
 /** One or more elements a selector is generated for. */
 export interface ScenarioNeedle {
   id: string;
@@ -61,6 +116,7 @@ export interface ScenarioExpectation {
 }
 
 export interface ParsedScenario {
+  metadata: ScenarioMetadata;
   needles: ScenarioNeedle[];
   expectations: ScenarioExpectation[];
 }
@@ -91,6 +147,8 @@ export function parseScenario(rootElement: Element): ParsedScenario {
   const needles: ScenarioNeedle[] = [];
   const expectations: ScenarioExpectation[] = [];
   const needlesById = new Map<string, ScenarioNeedle>();
+  let metadata = emptyMetadata();
+  let isFirstComment = true;
   let inlineCount = 0;
 
   function getNeedle(id: string): ScenarioNeedle {
@@ -104,6 +162,15 @@ export function parseScenario(rootElement: Element): ParsedScenario {
   }
 
   forEachComment(rootElement, (comment) => {
+    if (isFirstComment) {
+      isFirstComment = false;
+      const frontMatter = parseFrontMatterContent(comment.textContent);
+      if (frontMatter) {
+        metadata = frontMatter;
+        return;
+      }
+    }
+
     const parsed = parseComment(comment);
     if (!parsed) {
       return;
@@ -132,5 +199,5 @@ export function parseScenario(rootElement: Element): ParsedScenario {
     }
   });
 
-  return { needles, expectations };
+  return { metadata, needles, expectations };
 }
