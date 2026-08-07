@@ -17,6 +17,8 @@ export default [
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.json",
+        // Resolve the project relative to this package, not the caller's cwd.
+        tsconfigRootDir: import.meta.dirname,
       },
     },
   },
@@ -25,6 +27,15 @@ export default [
   {
     files: ["**/*.js"],
     ...tseslint.configs.disableTypeChecked,
+  },
+  {
+    files: ["config/**/*.js"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+      },
+    },
   },
   {
     rules: {

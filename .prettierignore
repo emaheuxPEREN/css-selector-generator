@@ -1,4 +1,7 @@
-build
-esm
-types
-test/html
+packages/*/build
+packages/*/esm
+packages/*/types
+packages/*/test/html
+
+# Comment placement is semantic here: a comment's parent element is the needle.
+packages/*/scenario
