@@ -3,15 +3,14 @@
 import { URL } from "node:url";
 import * as path from "node:path";
 import { build } from "esbuild";
-import { readFile } from "node:fs/promises";
 import chalk from "chalk";
 
 import { chromium } from "playwright";
 import type { Page } from "playwright";
 import type getCssSelector from "../src";
-import type * as ScenarioUtilities from "./scenario-utilities";
-import type { ParsedScenario } from "./scenario-utilities";
-import { glob } from "glob";
+import type * as ScenarioUtilities from "css-selector-generator-scenarios";
+import type { ParsedScenario } from "css-selector-generator-scenarios";
+import { scenarios } from "css-selector-generator-scenarios";
 import { consoleMessageToTerminal } from "../playwright-tests/utilities";
 
 interface ScenarioTestResultItem {
@@ -34,7 +33,6 @@ declare global {
 }
 
 const __dirname = new URL(".", import.meta.url).pathname;
-const scenariosDir = path.resolve(__dirname, "../scenario");
 
 async function getTestEnvironment() {
   const browser = await chromium.launch({ headless: true });
@@ -42,10 +40,13 @@ async function getTestEnvironment() {
 
   page.on("console", consoleMessageToTerminal);
 
-  // inject test utilities
+  // inject scenario utilities
   await buildAndInsertScript(
     {
-      srcPath: path.resolve(__dirname, "./scenario-utilities.ts"),
+      srcPath: path.resolve(
+        __dirname,
+        "../../css-selector-generator-scenarios/src/index.ts",
+      ),
       buildPath: path.resolve(
         __dirname,
         "../temp/scenarios/scenario-utilities.js",
@@ -76,18 +77,10 @@ async function testScenario(
   page: Page,
 ): Promise<ScenarioTestResult> {
   return page.evaluate(async (content: string) => {
-    // Written as a complete document through the HTML parser: fallback
-    // selectors encode the document structure, and declarative shadow DOM is
-    // only parsed this way.
-    const iframe = document.createElement("iframe");
-    iframe.srcdoc = `<!DOCTYPE html><html lang="en"><head></head><body>${content}</body></html>`;
-    const loaded = new Promise<void>((resolve) => {
-      iframe.addEventListener("load", () => {
-        resolve();
-      });
-    });
-    document.body.appendChild(iframe);
-    await loaded;
+    const iframe = await scenarioUtilities.createScenarioFrame(
+      content,
+      document,
+    );
 
     const doc = iframe.contentDocument;
     if (!doc) {
@@ -214,24 +207,15 @@ async function buildScript({
   });
 }
 
-async function getScenariosFiles() {
-  return glob("**/*.html", {
-    cwd: scenariosDir,
-  });
-}
-
 async function testAllScenarios() {
   // TODO try to use Assert node module for the reporting
   const { page, browser } = await getTestEnvironment();
 
   const scenarioErrors: Record<string, ScenarioTestResultItem[]> = {};
 
-  const scenarioFiles = await getScenariosFiles();
-
-  for (const scenarioFile of scenarioFiles) {
-    const scenarioFilePath = path.resolve(scenariosDir, scenarioFile);
-    const scenarioContent = await readFile(scenarioFilePath, "utf-8");
-    const scenarioData = await testScenario(scenarioContent, page);
+  for (const scenario of scenarios) {
+    const scenarioFile = scenario.id;
+    const scenarioData = await testScenario(scenario.html, page);
     const { error } = scenarioData;
 
     if (error.length > 0) {

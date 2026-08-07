@@ -30,6 +30,7 @@
     "clean": "rimraf ./esm ./types ./temp",
     "test": "npm run test:unit && npm run test:playwright && npm run test:scenarios",
     "test:playwright": "playwright test playwright-tests/playwright.spec.ts --config playwright-tests/playwright.config.ts",
+    "pretest:scenarios": "tsx ../css-selector-generator-scenarios/src/generate.ts",
     "test:scenarios": "tsx ./test/scenarios.ts",
     "test:unit": "wtr 'test/**/*.spec.ts'",
     "dev": "npm run watch:unit & npm run watch:playwright & npm run watch:scenarios",
@@ -47,9 +48,10 @@
     "version": "npm run build && npm run changelog && npm install --package-lock-only --prefix ../.. && git add -A",
     "watch:unit": "chokidar '{src,test}/**/*.ts' -c 'npm run test:unit'",
     "watch:playwright": "chokidar 'playwright-tests/**/*.ts' -c 'npm run test:playwright'",
-    "watch:scenarios": "chokidar 'src/**/*.ts' 'scenario/**/*.html' -c 'npm run test:scenarios'"
+    "watch:scenarios": "chokidar 'src/**/*.ts' '../css-selector-generator-scenarios/scenarios/**/*.html' -c 'npm run test:scenarios'"
   },
   "devDependencies": {
+    "css-selector-generator-scenarios": "*",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.50.1",
     "@types/chai": "^5.0.1",

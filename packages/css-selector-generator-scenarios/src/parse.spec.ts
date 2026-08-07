@@ -4,7 +4,7 @@ import {
   parseCommentContent,
   parseFrontMatterContent,
   parseScenario,
-} from "./scenario-utilities.js";
+} from "./parse.js";
 
 describe("Scenario Utilities", () => {
   let rootElement: Element;

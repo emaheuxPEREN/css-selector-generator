@@ -1,4 +1,4 @@
-import type { CssSelectorGeneratorOptionsInput } from "../src/types.js";
+import type { ScenarioOptions } from "./types.js";
 
 // Keys are bare identifiers, so that a value may itself contain the divider
 // character. A greedy key would split on the LAST divider instead, which
@@ -57,7 +57,7 @@ export interface ScenarioMetadata {
   title: string | null;
   description: string | null;
   tags: string[];
-  options: CssSelectorGeneratorOptionsInput;
+  options: ScenarioOptions;
 }
 
 function emptyMetadata(): ScenarioMetadata {
@@ -96,7 +96,7 @@ export function parseFrontMatterContent(
     }
     if (key === "options") {
       try {
-        metadata.options = JSON.parse(val) as CssSelectorGeneratorOptionsInput;
+        metadata.options = JSON.parse(val) as ScenarioOptions;
       } catch {
         throw new Error(`Scenario has invalid JSON in "options": ${val}`);
       }

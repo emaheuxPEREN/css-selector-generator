@@ -9,10 +9,12 @@
   ],
   "scripts": {
     "build": "npm run build -w css-selector-generator",
-    "test": "npm run test -w css-selector-generator",
-    "lint": "npm run lint -w css-selector-generator",
-    "lint:build": "npm run lint:build -w css-selector-generator",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:build": "npm run lint:build --workspaces --if-present",
     "dev": "npm run dev -w css-selector-generator",
+    "generate": "npm run generate -w css-selector-generator-scenarios",
+    "generate:check": "npm run generate && git diff --exit-code -- packages/css-selector-generator-scenarios/src/generated.ts",
     "release": "npm version --workspaces=false --prefix packages/css-selector-generator"
   },
   "repository": {
