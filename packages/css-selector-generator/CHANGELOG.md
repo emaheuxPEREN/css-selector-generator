@@ -1,3 +1,11 @@
+## [3.9.4](https://github.com/fczbkk/css-selector-generator/compare/v3.9.3...v3.9.4) (2026-08-07)
+
+
+### Bug Fixes
+
+* create the release commit and tag explicitly ([2e4aabd](https://github.com/fczbkk/css-selector-generator/commit/2e4aabd33c76e7e0354f63e36ef5ab05af02cc4e))
+* detect shadow root without instanceof in fallback selectors ([532c9e3](https://github.com/fczbkk/css-selector-generator/commit/532c9e3d18834e045b47925c8a804ce26f52f43f))
+* do not report iframe documents as shadow roots ([879e0f9](https://github.com/fczbkk/css-selector-generator/commit/879e0f9969ba01be8a8ee67f33987a6b5ebd6847))
 ## [3.9.3](https://github.com/fczbkk/css-selector-generator/compare/v3.9.2...v3.9.3) (2026-08-07)
 
 ### Bug Fixes
