@@ -1,3 +1,16 @@
+## [3.9.3](https://github.com/fczbkk/css-selector-generator/compare/v3.9.2...v3.9.3) (2026-08-07)
+
+
+### Bug Fixes
+
+* fix powerset generator for size>4 sets ([14094ea](https://github.com/fczbkk/css-selector-generator/commit/14094ea20ff18445b718a5d837adceb967f33aac))
+
+
+### Performance Improvements
+
+* cache getSelectorsList results ([8137a0d](https://github.com/fczbkk/css-selector-generator/commit/8137a0dae77969f407bdf9e707043db269749a10))
+* optimize getIntersection ([0835af6](https://github.com/fczbkk/css-selector-generator/commit/0835af6a3b1571174d03e621cb0aec68afd8c665))
+* optimize testSelector, add early fail ([0a49adb](https://github.com/fczbkk/css-selector-generator/commit/0a49adb2b49b9966b09eb5ed2bd9f3885c9708f2))
 ## [3.9.2](https://github.com/fczbkk/css-selector-generator/compare/v3.9.1...v3.9.2) (2026-04-21)
 
 ### Bug Fixes
