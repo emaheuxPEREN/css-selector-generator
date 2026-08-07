@@ -1,6 +1,8 @@
+<!-- Generated from the repository README. Do not edit. -->
+
 # CSS Selector Generator
 
-JavaScript library for creating CSS selectors for a given DOM element or multiple DOM elements.
+Generates unique CSS selectors for DOM elements. Supports multiple elements, Shadow DOM and configurable selector types.
 
 See the [benchmark](https://fczbkk.github.io/css-selector-generator-benchmark/) to compare the speed and features of CSS Selector Generator with similar libraries.
 
@@ -27,6 +29,7 @@ See the [benchmark](https://fczbkk.github.io/css-selector-generator-benchmark/) 
   - [Max candidates](#max-candidates)
   - [Max results](#max-results)
   - [Use scope](#use-scope)
+- [Packages in this repository](#packages-in-this-repository)
 - [Bug reports, feature requests and contact](#bug-reports-feature-requests-and-contact)
 - [License](#license)
 
@@ -573,6 +576,13 @@ getCssSelector(needleElement, {
 > :nth-child(1)   ->   <div>
 > :nth-child(1)   ->     <div> <!-- needleElement -->
 ```
+
+## Packages in this repository
+
+| Package                                                                                                                                    | Description                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| [css-selector-generator](https://github.com/fczbkk/css-selector-generator/tree/master/packages/css-selector-generator)                     | The library documented above. Published to npm.                                           |
+| [css-selector-generator-scenarios](https://github.com/fczbkk/css-selector-generator/tree/master/packages/css-selector-generator-scenarios) | Shared test scenarios, used by the library's test suite and by the sandbox and benchmark. |
 
 ## Bug reports, feature requests and contact
 
