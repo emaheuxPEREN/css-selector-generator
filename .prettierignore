@@ -3,5 +3,7 @@ packages/*/esm
 packages/*/types
 packages/*/test/html
 
-# Comment placement is semantic here: a comment's parent element is the needle.
-packages/*/scenario
+# Scenarios are hand-authored fixtures. Their layout is part of what they
+# communicate, e.g. `<div><!-- root -->` keeps the directive next to the
+# element it applies to.
+packages/*/scenarios
