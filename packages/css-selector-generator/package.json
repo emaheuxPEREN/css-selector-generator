@@ -45,7 +45,6 @@
     "watch:playwright": "chokidar 'playwright-tests/**/*.ts' -c 'npm run test:playwright'"
   },
   "devDependencies": {
-    "css-selector-generator-scenarios": "*",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.50.1",
     "@types/chai": "^5.0.1",

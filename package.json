@@ -25,5 +25,8 @@
     "type": "git",
     "url": "git+ssh://git@github.com/fczbkk/css-selector-generator.git"
   },
-  "homepage": "https://github.com/fczbkk/css-selector-generator/"
+  "homepage": "https://github.com/fczbkk/css-selector-generator/",
+  "devDependencies": {
+    "css-selector-generator-scenarios": "*"
+  }
 }
