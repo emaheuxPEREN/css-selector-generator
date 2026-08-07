@@ -71,7 +71,7 @@ describe("utilities - powerset", () => {
   });
 
   [0, 1, 2, 3, 4, 5, 6, 8].forEach((size) => {
-    it(`should generate exactly 2^n - 1 combinations for n=${size}`, () => {
+    it(`should generate exactly 2^n - 1 combinations for n=${String(size)}`, () => {
       const input = Array.from({ length: size }, (_, index) => index);
       const result = getPowerSet(input);
       assert.lengthOf(result, 2 ** size - 1);
@@ -79,7 +79,7 @@ describe("utilities - powerset", () => {
   });
 
   [4, 5].forEach((size) => {
-    it(`should match an independently computed reference order for n=${size}`, () => {
+    it(`should match an independently computed reference order for n=${String(size)}`, () => {
       const input = Array.from({ length: size }, (_, index) => index);
       const result = getPowerSet(input);
       assert.sameDeepOrderedMembers(result, referencePowerSet(input));
