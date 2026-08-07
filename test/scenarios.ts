@@ -10,7 +10,7 @@ import { chromium } from "playwright";
 import type { Page } from "playwright";
 import type getCssSelector from "../src";
 import type * as ScenarioUtilities from "./scenario-utilities";
-import type { ScenarioExpectations } from "./scenario-utilities";
+import type { ParsedScenario } from "./scenario-utilities";
 import { glob } from "glob";
 import { consoleMessageToTerminal } from "../playwright-tests/utilities";
 
@@ -95,24 +95,36 @@ async function testScenario(
     }
 
     try {
-      const scenarioExpectations: ScenarioExpectations =
-        scenarioUtilities.parseAllComments(doc.body);
+      const scenario: ParsedScenario = scenarioUtilities.parseScenario(
+        doc.body,
+      );
+      const needlesById = new Map(
+        scenario.needles.map((needle) => [needle.id, needle]),
+      );
 
       const result: ScenarioTestResult = {
         success: [],
         error: [],
       };
-      scenarioExpectations.forEach((targetElements, expectedSelector) => {
-        const elements = Array.from(targetElements);
+      scenario.expectations.forEach(({ needleId, selector }) => {
+        const needle = needlesById.get(needleId);
+        if (!needle || needle.elements.length === 0) {
+          result.error.push({
+            key: selector,
+            expectation: selector,
+            selector: `no element carries the identifier "${needleId}"`,
+          });
+          return;
+        }
+
+        const { elements } = needle;
         const generatedSelector = CssSelectorGenerator.getCssSelector(
           elements.length === 1 ? elements[0] : elements,
         );
-        result[
-          expectedSelector === generatedSelector ? "success" : "error"
-        ].push({
-          expectation: expectedSelector,
+        result[selector === generatedSelector ? "success" : "error"].push({
+          expectation: selector,
           selector: generatedSelector,
-          key: expectedSelector,
+          key: selector,
         });
       });
 

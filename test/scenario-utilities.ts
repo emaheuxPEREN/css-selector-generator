@@ -5,33 +5,6 @@
 const COMMENT_SPLITTER = /^\s*(?<key>[A-Za-z][\w-]*)\s*:\s*(?<val>.*\S)\s*$/;
 const EXPECTATION_SPLITTER = /^\s*(?<key>[\w-]+)\s*;\s*(?<val>.*\S)\s*$/;
 
-type MapOfSets<keyType, valType> = Map<keyType, Set<valType>>;
-
-/**
- * Helper function that makes it easier working with Maps of Sets. Especially the `.set()` method, which checks for existing keys and creates a new Set if needed.
- */
-function createMapOfSets<keyType, valType>() {
-  const data: MapOfSets<keyType, valType> = new Map();
-  return {
-    getData: () => data,
-    get: (key: keyType) => data.get(key) ?? new Set(),
-    set: (key: keyType, val: valType) => {
-      const set = data.get(key) ?? new Set();
-      set.add(val);
-      data.set(key, set);
-    },
-    forEach: (
-      callback: (
-        val: Set<valType>,
-        key: keyType,
-        map: MapOfSets<keyType, valType>,
-      ) => void,
-    ) => {
-      data.forEach(callback);
-    },
-  };
-}
-
 function splitContent(content: string, re: RegExp): [string | null, string] {
   const match = content.match(re);
   if (!match?.groups) {
@@ -76,18 +49,30 @@ export function parseComment(comment: Comment): ScenarioExpectationItem | null {
   return null;
 }
 
-export type ScenarioExpectations = Map<string, Set<Element>>;
+/** One or more elements a selector is generated for. */
+export interface ScenarioNeedle {
+  id: string;
+  elements: Element[];
+}
+
+export interface ScenarioExpectation {
+  needleId: string;
+  selector: string;
+}
+
+export interface ParsedScenario {
+  needles: ScenarioNeedle[];
+  expectations: ScenarioExpectation[];
+}
 
 function isCommentNode(node: Node): node is Comment {
   return node.nodeType === Node.COMMENT_NODE;
 }
 
-export function parseAllComments(rootElement: Element): ScenarioExpectations {
-  const foundComments: ScenarioExpectationItem[] = [];
-  const elementsByExpectation = createMapOfSets<string, Element>();
-  const elementsByIdentifier = createMapOfSets<string, Element>();
-  const expectationsByIdentifier = createMapOfSets<string, string>();
-
+function forEachComment(
+  rootElement: Element,
+  callback: (comment: Comment) => void,
+): void {
   // The root may belong to another document, e.g. an iframe.
   const iterator = rootElement.ownerDocument.createNodeIterator(
     rootElement,
@@ -97,34 +82,55 @@ export function parseAllComments(rootElement: Element): ScenarioExpectations {
   let currentNode: Node | null;
   while ((currentNode = iterator.nextNode())) {
     if (isCommentNode(currentNode)) {
-      const comment = parseComment(currentNode);
-      if (comment) {
-        foundComments.push(comment);
-      }
+      callback(currentNode);
     }
   }
+}
 
-  foundComments.forEach(({ element, expectation, identifier }) => {
-    if (element && expectation) {
-      elementsByExpectation.set(expectation, element);
+export function parseScenario(rootElement: Element): ParsedScenario {
+  const needles: ScenarioNeedle[] = [];
+  const expectations: ScenarioExpectation[] = [];
+  const needlesById = new Map<string, ScenarioNeedle>();
+  let inlineCount = 0;
+
+  function getNeedle(id: string): ScenarioNeedle {
+    let needle = needlesById.get(id);
+    if (!needle) {
+      needle = { id, elements: [] };
+      needlesById.set(id, needle);
+      needles.push(needle);
     }
-    if (element && identifier) {
-      elementsByIdentifier.set(identifier, element);
+    return needle;
+  }
+
+  forEachComment(rootElement, (comment) => {
+    const parsed = parseComment(comment);
+    if (!parsed) {
+      return;
     }
-    if (expectation && identifier) {
-      expectationsByIdentifier.set(identifier, expectation);
+    const { element, identifier, expectation } = parsed;
+
+    if (identifier && expectation) {
+      // Deliberately does not create the needle, so that an expectation
+      // naming an identifier that was never applied is reported rather than
+      // silently dropped.
+      expectations.push({ needleId: identifier, selector: expectation });
+      return;
+    }
+    if (!element) {
+      return;
+    }
+    if (identifier) {
+      getNeedle(identifier).elements.push(element);
+      return;
+    }
+    if (expectation) {
+      // `#` cannot occur in an authored identifier, so this cannot collide.
+      const id = `#${String(inlineCount++)}`;
+      getNeedle(id).elements.push(element);
+      expectations.push({ needleId: id, selector: expectation });
     }
   });
 
-  expectationsByIdentifier.forEach((expectations, identifier) => {
-    const elements = elementsByIdentifier.get(identifier);
-    if (elements.size > 0) {
-      elements.forEach((element) => {
-        expectations.forEach((expectation) => {
-          elementsByExpectation.set(expectation, element);
-        });
-      });
-    }
-  });
-  return elementsByExpectation.getData();
+  return { needles, expectations };
 }
