@@ -1,5 +1,9 @@
-const COMMENT_SPLITTER = getRegExpSplitter(":");
-const EXPECTATION_SPLITTER = getRegExpSplitter(";");
+// Keys are bare identifiers, so that a value may itself contain the divider
+// character. A greedy key would split on the LAST divider instead, which
+// breaks escaped selectors (`.aaa\:bbb`) and attribute values holding URLs
+// (`[href='http://example.com']`).
+const COMMENT_SPLITTER = /^\s*(?<key>[A-Za-z][\w-]*)\s*:\s*(?<val>.*\S)\s*$/;
+const EXPECTATION_SPLITTER = /^\s*(?<key>[\w-]+)\s*;\s*(?<val>.*\S)\s*$/;
 
 type MapOfSets<keyType, valType> = Map<keyType, Set<valType>>;
 
@@ -28,11 +32,7 @@ function createMapOfSets<keyType, valType>() {
   };
 }
 
-function getRegExpSplitter(divider: string): RegExp {
-  return new RegExp(`^\\s*(?<key>.+)\\s*${divider}\\s*(?<val>.+)\\s*$`);
-}
-
-function splitContent(content: string, re: RegExp): [string, string] {
+function splitContent(content: string, re: RegExp): [string | null, string] {
   const match = content.match(re);
   if (!match?.groups) {
     return [null, content];

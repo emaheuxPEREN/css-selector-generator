@@ -36,12 +36,53 @@ describe("Scenario Utilities", () => {
     });
 
     it("should parse identifier and expectation", () => {
-      const content = "expect: mock identifier; mock expectation";
+      const content = "expect: mockIdentifier; mock expectation";
       const result = parseCommentContent(content);
       assert.deepEqual(result, {
-        identifier: "mock identifier",
+        identifier: "mockIdentifier",
         expectation: "mock expectation",
       });
+    });
+
+    it("should keep colons that are part of the expectation", () => {
+      const result = parseCommentContent("expect: .aaa\\:bbb");
+      assert.deepEqual(result, { expectation: ".aaa\\:bbb" });
+    });
+
+    it("should keep colons in an attribute value", () => {
+      const result = parseCommentContent(
+        "expect: [href='http://example.com']",
+      );
+      assert.deepEqual(result, {
+        expectation: "[href='http://example.com']",
+      });
+    });
+
+    it("should keep colons in a grouped expectation", () => {
+      const result = parseCommentContent("expect: needle; .aaa\\:bbb");
+      assert.deepEqual(result, {
+        identifier: "needle",
+        expectation: ".aaa\\:bbb",
+      });
+    });
+
+    it("should not treat a semicolon inside a value as a group divider", () => {
+      const result = parseCommentContent("expect: [data-aaa='bbb;ccc']");
+      assert.deepEqual(result, {
+        expectation: "[data-aaa='bbb;ccc']",
+      });
+    });
+
+    it("should keep a JSON value intact", () => {
+      const result = parseCommentContent('options: {"selectors": ["id"]}');
+      assert.deepEqual(result, null);
+    });
+
+    it("should ignore a multiline note whose lines contain colons", () => {
+      const result = parseCommentContent(
+        "\n  NOTE: the chain is\n  :root -> HTML\n",
+      );
+      assert.deepEqual(result, null);
     });
   });
 
@@ -78,11 +119,11 @@ describe("Scenario Utilities", () => {
 
     it("should not include element if both identifier and expectation are present", () => {
       const comment = generateComment(
-        "expect: mock identifier; mock expectation",
+        "expect: mockIdentifier; mock expectation",
       );
       const result = parseComment(comment);
       assert.deepEqual(result, {
-        identifier: "mock identifier",
+        identifier: "mockIdentifier",
         expectation: "mock expectation",
       });
     });

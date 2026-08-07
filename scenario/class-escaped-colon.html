@@ -1,0 +1,10 @@
+<!--
+  Class names containing characters that must be escaped in a selector.
+  The generated selector has to escape them AND still resolve back to the
+  element, which is what the old greedy comment splitter made impossible to
+  express: it split `expect: .aaa\:bbb` on the LAST colon.
+-->
+
+<div class="aaa:bbb"><!-- expect: .aaa\:bbb --></div>
+
+<div class="ccc+ddd"><!-- expect: .ccc\+ddd --></div>
