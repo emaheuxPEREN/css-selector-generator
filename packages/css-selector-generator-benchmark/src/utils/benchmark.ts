@@ -1,7 +1,7 @@
-import { getCssSelector } from 'css-selector-generator';
-import { finder } from '@medv/finder';
+import { getCssSelector } from "css-selector-generator";
+import { finder } from "@medv/finder";
 // @ts-ignore - CommonJS module
-import uniqueSelector from '@cypress/unique-selector/lib/index.js';
+import uniqueSelector from "@cypress/unique-selector/lib/index.js";
 
 const unique = uniqueSelector.default || uniqueSelector;
 
@@ -44,7 +44,7 @@ function getAllElements(container: HTMLElement): Element[] {
   const walker = document.createTreeWalker(
     container,
     NodeFilter.SHOW_ELEMENT,
-    null
+    null,
   );
 
   let node;
@@ -58,7 +58,7 @@ function getAllElements(container: HTMLElement): Element[] {
 function testSelector(
   selector: string | null,
   element: Element,
-  container: HTMLElement
+  container: HTMLElement,
 ): { isUnique: boolean; matchCount: number } {
   if (!selector) {
     return { isUnique: false, matchCount: 0 };
@@ -79,7 +79,7 @@ async function runLibraryBenchmark(
   elements: Element[],
   container: HTMLElement,
   generator: (element: Element) => string | null,
-  onProgress?: (progress: BenchmarkProgress) => void
+  onProgress?: (progress: BenchmarkProgress) => void,
 ): Promise<LibraryStats> {
   const results: LibraryResult[] = [];
   let totalTime = 0;
@@ -101,7 +101,7 @@ async function runLibraryBenchmark(
       });
       // Allow UI to update every 10 elements
       if (i % 10 === 0) {
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
     }
 
@@ -142,11 +142,14 @@ async function runLibraryBenchmark(
   }
 
   const averageTime = totalTime / elements.length;
-  const shortestSelector = selectorLengths.length > 0 ? Math.min(...selectorLengths) : 0;
-  const longestSelector = selectorLengths.length > 0 ? Math.max(...selectorLengths) : 0;
+  const shortestSelector =
+    selectorLengths.length > 0 ? Math.min(...selectorLengths) : 0;
+  const longestSelector =
+    selectorLengths.length > 0 ? Math.max(...selectorLengths) : 0;
   const averageSelectorLength =
     selectorLengths.length > 0
-      ? selectorLengths.reduce((sum, len) => sum + len, 0) / selectorLengths.length
+      ? selectorLengths.reduce((sum, len) => sum + len, 0) /
+        selectorLengths.length
       : 0;
 
   return {
@@ -167,55 +170,57 @@ async function runLibraryBenchmark(
 
 export async function runBenchmark(
   htmlContent: string,
-  onProgress?: (progress: BenchmarkProgress) => void
+  onProgress?: (progress: BenchmarkProgress) => void,
 ): Promise<BenchmarkResults> {
   // Create an iframe to test in real DOM
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
   document.body.appendChild(iframe);
 
   const iframeDoc = iframe.contentDocument || iframe.contentWindow!.document;
   iframeDoc.open();
-  iframeDoc.write(`<!DOCTYPE html><html><head></head><body>${htmlContent}</body></html>`);
+  iframeDoc.write(
+    `<!DOCTYPE html><html><head></head><body>${htmlContent}</body></html>`,
+  );
   iframeDoc.close();
 
   const container = iframeDoc.body;
   const elements = getAllElements(container);
 
   const cssSelectorGeneratorStats = await runLibraryBenchmark(
-    'css-selector-generator',
+    "css-selector-generator",
     elements,
     container,
     (element) => getCssSelector(element, { root: container }),
-    onProgress
+    onProgress,
   );
 
   const cssSelectorGeneratorLimitedStats = await runLibraryBenchmark(
-    'css-selector-generator (custom options)',
+    "css-selector-generator (custom options)",
     elements,
     container,
     (element) =>
       getCssSelector(element, {
         root: container,
-        selectors: ['id', 'class', 'tag', 'nthchild'],
+        selectors: ["id", "class", "tag", "nthchild"],
       }),
-    onProgress
+    onProgress,
   );
 
   const finderStats = await runLibraryBenchmark(
-    '@medv/finder',
+    "@medv/finder",
     elements,
     container,
     (element) => finder(element, { root: container }),
-    onProgress
+    onProgress,
   );
 
   const uniqueSelectorStats = await runLibraryBenchmark(
-    '@cypress/unique-selector',
+    "@cypress/unique-selector",
     elements,
     container,
     (element) => unique(element),
-    onProgress
+    onProgress,
   );
 
   // Clean up iframe

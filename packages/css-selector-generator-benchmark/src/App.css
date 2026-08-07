@@ -500,3 +500,26 @@ body {
   color: #333;
   text-decoration: none;
 }
+
+.scenario-conformance {
+  margin-top: 2rem;
+}
+
+.scenario-conformance .note {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.scenario-conformance code {
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.conformance-toggle {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}

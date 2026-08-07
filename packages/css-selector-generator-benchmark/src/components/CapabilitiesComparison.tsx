@@ -1,6 +1,7 @@
-import packageJson from '../../package.json';
+import packageJson from "../../package.json";
 
-type LibraryName = 'css-selector-generator' | '@medv/finder' | '@cypress/unique-selector';
+type LibraryName =
+  "css-selector-generator" | "@medv/finder" | "@cypress/unique-selector";
 
 interface LibraryCapability {
   support: boolean;
@@ -15,86 +16,129 @@ interface Capability {
 }
 
 const LIBRARY_URLS: Record<LibraryName, string> = {
-  'css-selector-generator': 'https://github.com/fczbkk/css-selector-generator',
-  '@medv/finder': 'https://github.com/antonmedv/finder',
-  '@cypress/unique-selector': 'https://github.com/cypress-io/unique-selector',
+  "css-selector-generator": "https://github.com/fczbkk/css-selector-generator",
+  "@medv/finder": "https://github.com/antonmedv/finder",
+  "@cypress/unique-selector": "https://github.com/cypress-io/unique-selector",
 };
 
 function getLibraryVersion(libraryName: LibraryName): string {
   const version = packageJson.dependencies[libraryName];
-  return version ? version.replace(/^\^/, '') : 'unknown';
+  return version ? version.replace(/^\^/, "") : "unknown";
 }
 
 export function CapabilitiesComparison() {
   const capabilities: Capability[] = [
     {
-      name: 'Current version',
-      description: '',
+      name: "Current version",
+      description: "",
       hideIndicators: true,
       libraries: {
-        'css-selector-generator': { support: true, note: getLibraryVersion('css-selector-generator') },
-        '@medv/finder': { support: true, note: getLibraryVersion('@medv/finder') },
-        '@cypress/unique-selector': { support: true, note: getLibraryVersion('@cypress/unique-selector') },
+        "css-selector-generator": {
+          support: true,
+          note: getLibraryVersion("css-selector-generator"),
+        },
+        "@medv/finder": {
+          support: true,
+          note: getLibraryVersion("@medv/finder"),
+        },
+        "@cypress/unique-selector": {
+          support: true,
+          note: getLibraryVersion("@cypress/unique-selector"),
+        },
       },
     },
     {
-      name: 'Customization options',
-      description: '',
+      name: "Customization options",
+      description: "",
       hideIndicators: true,
       libraries: {
-        'css-selector-generator': { support: true, note: '10+ options: selector types, whitelist/blacklist, root, combining, optimization limits' },
-        '@medv/finder': { support: true, note: 'Filter functions (idName, className, tagName, attr), optimization params (seedMinLength, optimizedMinLength, maxNumberOfPathChecks), timeout control' },
-        '@cypress/unique-selector': { support: false, note: 'Only selector types array' },
+        "css-selector-generator": {
+          support: true,
+          note: "10+ options: selector types, whitelist/blacklist, root, combining, optimization limits",
+        },
+        "@medv/finder": {
+          support: true,
+          note: "Filter functions (idName, className, tagName, attr), optimization params (seedMinLength, optimizedMinLength, maxNumberOfPathChecks), timeout control",
+        },
+        "@cypress/unique-selector": {
+          support: false,
+          note: "Only selector types array",
+        },
       },
     },
     {
-      name: 'Multiple elements',
-      description: 'Generate a single selector that matches multiple elements at once',
+      name: "Multiple elements",
+      description:
+        "Generate a single selector that matches multiple elements at once",
       libraries: {
-        'css-selector-generator': { support: true, note: 'Accepts array of elements, finds common selector' },
-        '@medv/finder': { support: false },
-        '@cypress/unique-selector': { support: false },
+        "css-selector-generator": {
+          support: true,
+          note: "Accepts array of elements, finds common selector",
+        },
+        "@medv/finder": { support: false },
+        "@cypress/unique-selector": { support: false },
       },
     },
     {
-      name: 'Multiple selectors',
-      description: 'Generate multiple unique selectors for the same element(s)',
+      name: "Multiple selectors",
+      description: "Generate multiple unique selectors for the same element(s)",
       libraries: {
-        'css-selector-generator': { support: true, note: 'cssSelectorGenerator() returns iterator' },
-        '@medv/finder': { support: false },
-        '@cypress/unique-selector': { support: false },
+        "css-selector-generator": {
+          support: true,
+          note: "cssSelectorGenerator() returns iterator",
+        },
+        "@medv/finder": { support: false },
+        "@cypress/unique-selector": { support: false },
       },
     },
     {
-      name: 'Performance optimization',
-      description: 'Options to control and limit selector generation performance',
+      name: "Performance optimization",
+      description:
+        "Options to control and limit selector generation performance",
       libraries: {
-        'css-selector-generator': { support: true, note: 'maxCombinations and maxCandidates options limit computation' },
-        '@medv/finder': { support: true, note: 'timeoutMs for hard timeout, maxNumberOfPathChecks to limit search iterations, optimizedMinLength to control optimization depth' },
-        '@cypress/unique-selector': { support: false },
+        "css-selector-generator": {
+          support: true,
+          note: "maxCombinations and maxCandidates options limit computation",
+        },
+        "@medv/finder": {
+          support: true,
+          note: "timeoutMs for hard timeout, maxNumberOfPathChecks to limit search iterations, optimizedMinLength to control optimization depth",
+        },
+        "@cypress/unique-selector": { support: false },
       },
     },
     {
-      name: 'Shadow DOM support',
-      description: 'Generate selectors for elements within Shadow DOM',
+      name: "Shadow DOM support",
+      description: "Generate selectors for elements within Shadow DOM",
       libraries: {
-        'css-selector-generator': { support: true },
-        '@medv/finder': { support: false, note: 'Not documented' },
-        '@cypress/unique-selector': { support: true },
+        "css-selector-generator": { support: true },
+        "@medv/finder": { support: false, note: "Not documented" },
+        "@cypress/unique-selector": { support: true },
       },
     },
     {
-      name: 'Filter functions',
-      description: 'Custom validation functions to allow/disallow specific selector values',
+      name: "Filter functions",
+      description:
+        "Custom validation functions to allow/disallow specific selector values",
       libraries: {
-        'css-selector-generator': { support: true, note: 'whitelist/blacklist, with support for regex and filter functions' },
-        '@medv/finder': { support: true, note: 'idName, className, tagName, attr filter functions; className defaults to wordLike() pattern filtering CSS-in-JS generated names' },
-        '@cypress/unique-selector': { support: false },
+        "css-selector-generator": {
+          support: true,
+          note: "whitelist/blacklist, with support for regex and filter functions",
+        },
+        "@medv/finder": {
+          support: true,
+          note: "idName, className, tagName, attr filter functions; className defaults to wordLike() pattern filtering CSS-in-JS generated names",
+        },
+        "@cypress/unique-selector": { support: false },
       },
     },
   ];
 
-  const libraryNames: LibraryName[] = ['css-selector-generator', '@medv/finder', '@cypress/unique-selector'];
+  const libraryNames: LibraryName[] = [
+    "css-selector-generator",
+    "@medv/finder",
+    "@cypress/unique-selector",
+  ];
 
   return (
     <div className="capabilities-comparison">
@@ -124,7 +168,9 @@ export function CapabilitiesComparison() {
                 <td className="capability-name">
                   <strong>{capability.name}</strong>
                   {capability.description && (
-                    <div className="capability-description">{capability.description}</div>
+                    <div className="capability-description">
+                      {capability.description}
+                    </div>
                   )}
                 </td>
                 {libraryNames.map((libName) => {
@@ -133,10 +179,12 @@ export function CapabilitiesComparison() {
                     <td key={libName} className="capability-cell">
                       {!capability.hideIndicators && (
                         <div className="support-indicator">
-                          {lib.support ? '✅' : '❌'}
+                          {lib.support ? "✅" : "❌"}
                         </div>
                       )}
-                      {lib.note && <div className="capability-note">{lib.note}</div>}
+                      {lib.note && (
+                        <div className="capability-note">{lib.note}</div>
+                      )}
                     </td>
                   );
                 })}

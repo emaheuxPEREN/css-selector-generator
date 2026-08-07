@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { BenchmarkResults } from '../utils/benchmark';
+import { useState } from "react";
+import type { BenchmarkResults } from "../utils/benchmark";
 
 interface SelectorComparisonProps {
   results: BenchmarkResults;
@@ -19,7 +19,7 @@ export function SelectorComparison({ results }: SelectorComparisonProps) {
           className="details-toggle"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          {isExpanded ? '▼' : '▶'} Selector Comparison
+          {isExpanded ? "▼" : "▶"} Selector Comparison
         </button>
         {isExpanded && (
           <label className="diff-toggle">
@@ -27,8 +27,8 @@ export function SelectorComparison({ results }: SelectorComparisonProps) {
               type="checkbox"
               checked={showOnlyDiffs}
               onChange={() => setShowOnlyDiffs(!showOnlyDiffs)}
-            />
-            {' '}Show only differences
+            />{" "}
+            Show only differences
           </label>
         )}
       </div>
@@ -36,39 +36,43 @@ export function SelectorComparison({ results }: SelectorComparisonProps) {
       {isExpanded && (
         <div className="comparison-content">
           {Array.from({ length: elementCount }).map((_, index) => {
-            const selectors = libraries.map(lib => lib.results[index]?.selector ?? null);
-            const hasDiff = selectors.some(s => s !== selectors[0]);
+            const selectors = libraries.map(
+              (lib) => lib.results[index]?.selector ?? null,
+            );
+            const hasDiff = selectors.some((s) => s !== selectors[0]);
             if (showOnlyDiffs && !hasDiff) return null;
 
-            const elementResults = libraries.map(lib => lib.results[index]);
+            const elementResults = libraries.map((lib) => lib.results[index]);
             const element = elementResults[0]?.element;
 
             return (
               <div key={index} className="element-comparison">
                 <div className="element-header">
-                  <strong>Element {index + 1}:</strong>{' '}
+                  <strong>Element {index + 1}:</strong>{" "}
                   {element && (
                     <span className="element-info">
                       {element.tagName.toLowerCase()}
                       {element.id && `#${element.id}`}
                       {element.className &&
-                        `.${element.className.toString().split(' ').slice(0, 2).join('.')}`
-                      }
+                        `.${element.className.toString().split(" ").slice(0, 2).join(".")}`}
                     </span>
                   )}
                 </div>
                 <div className="selector-rows">
                   {libraries.map((lib) => {
                     const result = lib.results[index];
-                    const selector = result?.selector || '(failed)';
+                    const selector = result?.selector || "(failed)";
                     const selectorClass = !result?.selector
-                      ? 'failed'
+                      ? "failed"
                       : !result.isUnique
-                      ? 'not-unique'
-                      : '';
+                        ? "not-unique"
+                        : "";
 
                     return (
-                      <div key={lib.name} className={`selector-row ${selectorClass}`}>
+                      <div
+                        key={lib.name}
+                        className={`selector-row ${selectorClass}`}
+                      >
                         <span className="library-name">{lib.name}</span>
                         <span className="selector-divider">|</span>
                         <span className="selector-value">{selector}</span>

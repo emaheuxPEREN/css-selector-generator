@@ -1,12 +1,22 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { BenchmarkTable } from './components/BenchmarkTable';
-import { CapabilitiesComparison } from './components/CapabilitiesComparison';
-import { SelectorComparison } from './components/SelectorComparison';
-import { runBenchmark, type BenchmarkResults, type BenchmarkProgress } from './utils/benchmark';
-import simpleHtml from './data/simple.html?raw';
-import complexHtml from './data/complex.html?raw';
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { BenchmarkTable } from "./components/BenchmarkTable";
+import { CapabilitiesComparison } from "./components/CapabilitiesComparison";
+import { SelectorComparison } from "./components/SelectorComparison";
+import { ScenarioConformance } from "./components/ScenarioConformance";
+import {
+  runBenchmark,
+  type BenchmarkResults,
+  type BenchmarkProgress,
+} from "./utils/benchmark";
+import {
+  runScenarioConformance,
+  type ConformanceProgress,
+  type LibraryConformance,
+} from "./utils/scenarioConformance";
+import simpleHtml from "./data/simple.html?raw";
+import complexHtml from "./data/complex.html?raw";
 
-type HtmlPreset = 'simple' | 'complex';
+type HtmlPreset = "simple" | "complex";
 
 const HTML_PRESETS: Record<HtmlPreset, string> = {
   simple: simpleHtml,
@@ -17,6 +27,11 @@ function App() {
   const [results, setResults] = useState<BenchmarkResults | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState<BenchmarkProgress | null>(null);
+  const [conformance, setConformance] = useState<LibraryConformance[] | null>(
+    null,
+  );
+  const [conformanceProgress, setConformanceProgress] =
+    useState<ConformanceProgress | null>(null);
   const htmlContentRef = useRef(simpleHtml);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isHtmlEditorExpanded, setIsHtmlEditorExpanded] = useState(false);
@@ -25,9 +40,11 @@ function App() {
     const el = textareaRef.current;
     if (!el) return;
     el.value = htmlContentRef.current;
-    const handleInput = () => { htmlContentRef.current = el.value; };
-    el.addEventListener('input', handleInput);
-    return () => el.removeEventListener('input', handleInput);
+    const handleInput = () => {
+      htmlContentRef.current = el.value;
+    };
+    el.addEventListener("input", handleInput);
+    return () => el.removeEventListener("input", handleInput);
   }, [isHtmlEditorExpanded]);
 
   const handlePresetChange = (preset: HtmlPreset) => {
@@ -41,6 +58,7 @@ function App() {
     setIsRunning(true);
     setResults(null);
     setProgress(null);
+    setConformance(null);
 
     // Use setTimeout to allow UI to update before heavy computation
     setTimeout(async () => {
@@ -48,11 +66,17 @@ function App() {
         textareaRef.current?.value ?? htmlContentRef.current,
         (prog) => {
           setProgress(prog);
-        }
+        },
       );
       setResults(benchmarkResults);
-      setIsRunning(false);
       setProgress(null);
+
+      const conformanceResults = await runScenarioConformance((prog) => {
+        setConformanceProgress(prog);
+      });
+      setConformance(conformanceResults);
+      setConformanceProgress(null);
+      setIsRunning(false);
     }, 100);
   };
 
@@ -67,6 +91,7 @@ function App() {
         <h1>CSS Selector Generator Benchmark</h1>
         <nav className="header-nav">
           <a href="#benchmark-results">Benchmark Results</a>
+          <a href="#scenario-conformance">Scenario Conformance</a>
           <a href="#library-capabilities">Library Capabilities Comparison</a>
         </nav>
       </header>
@@ -77,7 +102,7 @@ function App() {
             className="html-editor-toggle"
             onClick={() => setIsHtmlEditorExpanded(!isHtmlEditorExpanded)}
           >
-            {isHtmlEditorExpanded ? '▼' : '▶'} Custom HTML
+            {isHtmlEditorExpanded ? "▼" : "▶"} Custom HTML
           </button>
           {isHtmlEditorExpanded && (
             <>
@@ -85,13 +110,13 @@ function App() {
                 <span>Load preset:</span>
                 <button
                   className="preset-button"
-                  onClick={() => handlePresetChange('simple')}
+                  onClick={() => handlePresetChange("simple")}
                 >
                   Simple
                 </button>
                 <button
                   className="preset-button"
-                  onClick={() => handlePresetChange('complex')}
+                  onClick={() => handlePresetChange("complex")}
                 >
                   Complex
                 </button>
@@ -110,14 +135,26 @@ function App() {
         </div>
 
         <div className="controls">
-          <button className="button" onClick={handleRunBenchmark} disabled={isRunning}>
-            {isRunning ? 'Running benchmark...' : 'Re-run Benchmark'}
+          <button
+            className="button"
+            onClick={handleRunBenchmark}
+            disabled={isRunning}
+          >
+            {isRunning ? "Running benchmark..." : "Re-run Benchmark"}
           </button>
         </div>
 
         {isRunning && progress && (
           <div className="loading">
-            Testing {progress.libraryName}: {progress.currentElement}/{progress.totalElements} elements
+            Testing {progress.libraryName}: {progress.currentElement}/
+            {progress.totalElements} elements
+          </div>
+        )}
+
+        {isRunning && conformanceProgress && (
+          <div className="loading">
+            Checking scenario {conformanceProgress.current}/
+            {conformanceProgress.total}: {conformanceProgress.scenarioId}
           </div>
         )}
 
@@ -126,6 +163,12 @@ function App() {
             <BenchmarkTable libraries={results.libraries} />
 
             <SelectorComparison results={results} />
+          </div>
+        )}
+
+        {conformance && (
+          <div id="scenario-conformance">
+            <ScenarioConformance results={conformance} />
           </div>
         )}
 

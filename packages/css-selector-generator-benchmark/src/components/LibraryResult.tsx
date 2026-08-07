@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { LibraryStats } from '../utils/benchmark';
+import { useState } from "react";
+import type { LibraryStats } from "../utils/benchmark";
 
 interface LibraryResultProps {
   stats: LibraryStats;
@@ -23,14 +23,18 @@ export function LibraryResult({ stats }: LibraryResultProps) {
 
         <div className="stat">
           <div className="stat-label">Selectors Generated</div>
-          <div className={`stat-value ${successRate === 100 ? 'success' : 'warning'}`}>
+          <div
+            className={`stat-value ${successRate === 100 ? "success" : "warning"}`}
+          >
             {stats.successCount} ({successRate.toFixed(1)}%)
           </div>
         </div>
 
         <div className="stat">
           <div className="stat-label">Unique Selectors</div>
-          <div className={`stat-value ${uniqueRate === 100 ? 'success' : 'error'}`}>
+          <div
+            className={`stat-value ${uniqueRate === 100 ? "success" : "error"}`}
+          >
             {stats.uniqueCount} ({uniqueRate.toFixed(1)}%)
           </div>
         </div>
@@ -57,7 +61,9 @@ export function LibraryResult({ stats }: LibraryResultProps) {
 
         <div className="stat">
           <div className="stat-label">Avg Selector Length</div>
-          <div className="stat-value">{stats.averageSelectorLength.toFixed(1)}</div>
+          <div className="stat-value">
+            {stats.averageSelectorLength.toFixed(1)}
+          </div>
         </div>
 
         <div className="stat">
@@ -71,36 +77,41 @@ export function LibraryResult({ stats }: LibraryResultProps) {
         </div>
       </div>
 
-      <button className="details-toggle" onClick={() => setShowDetails(!showDetails)}>
-        {showDetails ? 'Hide' : 'Show'} Details
+      <button
+        className="details-toggle"
+        onClick={() => setShowDetails(!showDetails)}
+      >
+        {showDetails ? "Hide" : "Show"} Details
       </button>
 
       {showDetails && (
         <div className="details">
           {stats.results.map((result, index) => {
             const className = !result.selector
-              ? 'detail-item failed'
+              ? "detail-item failed"
               : !result.isUnique
-              ? 'detail-item not-unique'
-              : 'detail-item';
+                ? "detail-item not-unique"
+                : "detail-item";
 
             return (
               <div key={index} className={className}>
                 <div>
-                  <strong>Element {index + 1}:</strong> {result.element.tagName.toLowerCase()}
+                  <strong>Element {index + 1}:</strong>{" "}
+                  {result.element.tagName.toLowerCase()}
                   {result.element.id && `#${result.element.id}`}
-                  {result.element.className && `.${result.element.className.split(' ').join('.')}`}
+                  {result.element.className &&
+                    `.${result.element.className.split(" ").join(".")}`}
                 </div>
                 <div>
-                  <strong>Selector:</strong> {result.selector || '(failed)'}
+                  <strong>Selector:</strong> {result.selector || "(failed)"}
                 </div>
                 <div>
-                  <strong>Time:</strong> {result.time.toFixed(3)}ms |{' '}
-                  <strong>Matches:</strong> {result.matchCount} |{' '}
-                  <strong>Unique:</strong> {result.isUnique ? 'Yes' : 'No'}
+                  <strong>Time:</strong> {result.time.toFixed(3)}ms |{" "}
+                  <strong>Matches:</strong> {result.matchCount} |{" "}
+                  <strong>Unique:</strong> {result.isUnique ? "Yes" : "No"}
                   {result.selector && (
                     <>
-                      {' | '}
+                      {" | "}
                       <strong>Length:</strong> {result.selector.length}
                     </>
                   )}

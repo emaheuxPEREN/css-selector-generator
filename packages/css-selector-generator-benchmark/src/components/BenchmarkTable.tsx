@@ -1,14 +1,15 @@
-import type { LibraryStats } from '../utils/benchmark';
+import type { LibraryStats } from "../utils/benchmark";
 
 interface BenchmarkTableProps {
   libraries: LibraryStats[];
 }
 
 const LIBRARY_URLS: Record<string, string> = {
-  'css-selector-generator': 'https://github.com/fczbkk/css-selector-generator',
-  'css-selector-generator (custom options)': 'https://github.com/fczbkk/css-selector-generator',
-  '@medv/finder': 'https://github.com/antonmedv/finder',
-  '@cypress/unique-selector': 'https://github.com/cypress-io/unique-selector',
+  "css-selector-generator": "https://github.com/fczbkk/css-selector-generator",
+  "css-selector-generator (custom options)":
+    "https://github.com/fczbkk/css-selector-generator",
+  "@medv/finder": "https://github.com/antonmedv/finder",
+  "@cypress/unique-selector": "https://github.com/cypress-io/unique-selector",
 };
 
 export function BenchmarkTable({ libraries }: BenchmarkTableProps) {
@@ -17,28 +18,28 @@ export function BenchmarkTable({ libraries }: BenchmarkTableProps) {
     const uniqueRate = (stats.uniqueCount / stats.totalCount) * 100;
 
     switch (metric) {
-      case 'totalElements':
+      case "totalElements":
         return stats.totalCount;
-      case 'selectorsGenerated':
+      case "selectorsGenerated":
         return `${stats.successCount} (${successRate.toFixed(1)}%)`;
-      case 'uniqueSelectors':
+      case "uniqueSelectors":
         return `${stats.uniqueCount} (${uniqueRate.toFixed(1)}%)`;
-      case 'totalTime':
+      case "totalTime":
         return `${stats.totalTime.toFixed(2)}ms`;
-      case 'averageTime':
+      case "averageTime":
         return `${stats.averageTime.toFixed(3)}ms`;
-      case 'fastestTime':
+      case "fastestTime":
         return `${stats.fastestTime.toFixed(3)}ms`;
-      case 'slowestTime':
+      case "slowestTime":
         return `${stats.slowestTime.toFixed(3)}ms`;
-      case 'avgSelectorLength':
+      case "avgSelectorLength":
         return stats.averageSelectorLength.toFixed(1);
-      case 'shortestSelector':
+      case "shortestSelector":
         return stats.shortestSelector;
-      case 'longestSelector':
+      case "longestSelector":
         return stats.longestSelector;
       default:
-        return '';
+        return "";
     }
   };
 
@@ -46,26 +47,26 @@ export function BenchmarkTable({ libraries }: BenchmarkTableProps) {
     const successRate = (stats.successCount / stats.totalCount) * 100;
     const uniqueRate = (stats.uniqueCount / stats.totalCount) * 100;
 
-    if (metric === 'selectorsGenerated') {
-      return successRate === 100 ? 'success' : 'warning';
+    if (metric === "selectorsGenerated") {
+      return successRate === 100 ? "success" : "warning";
     }
-    if (metric === 'uniqueSelectors') {
-      return uniqueRate === 100 ? 'success' : 'error';
+    if (metric === "uniqueSelectors") {
+      return uniqueRate === 100 ? "success" : "error";
     }
-    return '';
+    return "";
   };
 
   const metrics = [
-    { key: 'totalElements', label: 'Total Elements' },
-    { key: 'selectorsGenerated', label: 'Selectors Generated' },
-    { key: 'uniqueSelectors', label: 'Unique Selectors' },
-    { key: 'totalTime', label: 'Total Time' },
-    { key: 'averageTime', label: 'Average Time' },
-    { key: 'fastestTime', label: 'Fastest Time' },
-    { key: 'slowestTime', label: 'Slowest Time' },
-    { key: 'avgSelectorLength', label: 'Avg Selector Length' },
-    { key: 'shortestSelector', label: 'Shortest Selector' },
-    { key: 'longestSelector', label: 'Longest Selector' },
+    { key: "totalElements", label: "Total Elements" },
+    { key: "selectorsGenerated", label: "Selectors Generated" },
+    { key: "uniqueSelectors", label: "Unique Selectors" },
+    { key: "totalTime", label: "Total Time" },
+    { key: "averageTime", label: "Average Time" },
+    { key: "fastestTime", label: "Fastest Time" },
+    { key: "slowestTime", label: "Slowest Time" },
+    { key: "avgSelectorLength", label: "Avg Selector Length" },
+    { key: "shortestSelector", label: "Shortest Selector" },
+    { key: "longestSelector", label: "Longest Selector" },
   ];
 
   return (
