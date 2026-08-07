@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "npm run build -w css-selector-generator",
+    "pretest": "npm run generate",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "lint:build": "npm run lint:build --workspaces --if-present",

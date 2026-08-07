@@ -31,7 +31,7 @@ export const scenarios: Scenario[] = [
       "gotcha"
     ],
     "options": {},
-    "html": "<!-- scenario\ntitle: Data URI in a src attribute\ndescription: A data URI can be enormous, so it must not become part of a selector.\ntags: attribute, gotcha\n-->\n\n<img src=\"data:image/gif;base64,R0lGODlhAQABAAAAACw=\"><!-- expect-not: [src='data:image/gif;base64,R0lGODlhAQABAAAAACw='] -->\n<img src=\"other.gif\">\n"
+    "html": "<!-- scenario\ntitle: Data URI in a src attribute\ndescription: A data URI can be enormous, so it must not become part of a selector.\ntags: attribute, gotcha\n-->\n\n<img src=\"data:image/gif;base64,R0lGODlhAQABAAAAACw=\"><!-- expect-not: [src='data:image/gif;base64,R0lGODlhAQABAAAAACw='] -->\n<img alt=\"decoy\">\n"
   },
   {
     "id": "attribute-url-value",
