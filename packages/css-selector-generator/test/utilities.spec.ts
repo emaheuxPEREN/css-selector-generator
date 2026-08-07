@@ -81,20 +81,20 @@ describe("Utilities", () => {
     });
     it("should yield common parents of multiple elements", () => {
       const data = parseTestHtml(`
-        <div><!-- name: grandparent -->
-          <div><!-- name: parent -->
+        <div><!-- identifier: grandparent -->
+          <div><!-- identifier: parent -->
             <div>
-              <div><!-- group: needle --></div>
+              <div><!-- identifier: needle --></div>
             </div>
-            <div><!-- group: needle --></div>
+            <div><!-- identifier: needle --></div>
           </div>
         </div>
       `);
-      const generator = parentsGenerator(data.group.needle, data.root);
+      const generator = parentsGenerator(data.needles("needle"), data.root);
       const result = [...generator];
       assert.deepEqual(result, [
-        data.element.parent,
-        data.element.grandparent,
+        data.needle("parent"),
+        data.needle("grandparent"),
         data.root,
       ]);
     });
@@ -118,11 +118,11 @@ describe("Utilities", () => {
   describe("viableParentsGenerator", () => {
     it("should not yield if there are no viable parents", () => {
       const data = parseTestHtml(`
-        <div class="aaa"><!-- group: needle --></div>
+        <div class="aaa"><!-- identifier: needle --></div>
         <div class="aaa"></div>
       `);
       const generator = viableParentsGenerator(
-        data.group.needle,
+        data.needles("needle"),
         ".aaa",
         data.root,
       );
@@ -154,27 +154,27 @@ describe("Utilities", () => {
 
     it("should yield viable nested parent", () => {
       const data = parseTestHtml(`
-        <div class="aaa"><!-- name: parent -->
-          <div class="aaa"><!-- group: needle --></div>
+        <div class="aaa"><!-- identifier: parent -->
+          <div class="aaa"><!-- identifier: needle --></div>
         </div>
       `);
       const generator = viableParentsGenerator(
-        data.group.needle,
+        data.needles("needle"),
         ".aaa",
         data.root,
       );
       const result = [...generator];
-      assert.deepEqual(result, [data.element.parent]);
+      assert.deepEqual(result, [data.needle("parent")]);
     });
   });
 
   describe("testParentSelector", () => {
     it("should return `false` if there is no match at all", () => {
       const data = parseTestHtml(`
-        <div class="aaa"><!-- name: needle --></div>
+        <div class="aaa"><!-- identifier: needle --></div>
       `);
       const result = testParentCandidate(
-        data.element.needle,
+        data.needle("needle"),
         ".xxx",
         data.root,
       );
@@ -182,11 +182,11 @@ describe("Utilities", () => {
     });
     it("should return `false` if it matches other than non-child elements within root", () => {
       const data = parseTestHtml(`
-        <div class="aaa"><!-- name: needle --></div>
+        <div class="aaa"><!-- identifier: needle --></div>
         <div class="aaa"></div>
       `);
       const result = testParentCandidate(
-        data.element.needle,
+        data.needle("needle"),
         ".aaa",
         data.root,
       );
@@ -194,12 +194,12 @@ describe("Utilities", () => {
     });
     it("should return `true` if it matches only needle and some of its children", () => {
       const data = parseTestHtml(`
-        <div class="aaa"><!-- name: needle -->
+        <div class="aaa"><!-- identifier: needle -->
           <div class="aaa"></div>
         </div>
       `);
       const result = testParentCandidate(
-        data.element.needle,
+        data.needle("needle"),
         ".aaa",
         data.root,
       );
@@ -207,10 +207,10 @@ describe("Utilities", () => {
     });
     it("should return `true` if it matches needle uniquely", () => {
       const data = parseTestHtml(`
-        <div class="aaa"><!-- name: needle --></div>
+        <div class="aaa"><!-- identifier: needle --></div>
       `);
       const result = testParentCandidate(
-        data.element.needle,
+        data.needle("needle"),
         ".aaa",
         data.root,
       );
@@ -219,11 +219,11 @@ describe("Utilities", () => {
     it("should return `false` if it matches also parents of needle", () => {
       const data = parseTestHtml(`
         <div class="aaa">
-          <div class="aaa"><!-- name: needle --></div>
+          <div class="aaa"><!-- identifier: needle --></div>
         </div>
       `);
       const result = testParentCandidate(
-        data.element.needle,
+        data.needle("needle"),
         ".aaa",
         data.root,
       );
