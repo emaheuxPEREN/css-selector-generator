@@ -37,6 +37,17 @@ describe("utilities - sanitizeRoot", () => {
     assert.equal(result, document);
   });
 
+  it("should return the owning document for an element inside an iframe", () => {
+    const iframe = root.appendChild(document.createElement("iframe"));
+    const iframeDocument = iframe.contentDocument;
+    const element = iframeDocument.body.appendChild(
+      iframeDocument.createElement("div"),
+    );
+    const result = sanitizeRoot(undefined, element);
+    assert.equal(result, iframeDocument);
+    assert.notEqual(result, document);
+  });
+
   it("should return shadow root if element is part of shadow DOM", () => {
     const shadowRoot = root.attachShadow({ mode: "open" });
     const wrapper = shadowRoot.appendChild(document.createElement("div"));
