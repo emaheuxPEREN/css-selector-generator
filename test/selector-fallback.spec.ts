@@ -101,6 +101,24 @@ describe("selector - fallback", function () {
     );
   });
 
+  it("should work with a shadow root in another document", () => {
+    const iframe = document.body.appendChild(document.createElement("iframe"));
+    const iframeDoc = iframe.contentDocument;
+    const host = iframeDoc.body.appendChild(iframeDoc.createElement("div"));
+    const shadowRoot = host.attachShadow({ mode: "open" });
+    const targetElement = shadowRoot.appendChild(
+      iframeDoc.createElement("div"),
+    );
+    shadowRoot.appendChild(iframeDoc.createElement("div"));
+
+    const result = getFallbackSelector([targetElement], shadowRoot);
+
+    assert.equal(result, ":nth-child(1)");
+    assert.deepEqual([...shadowRoot.querySelectorAll(result)], [targetElement]);
+
+    iframe.remove();
+  });
+
   it("should work with elements in iframe", () => {
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";

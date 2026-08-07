@@ -1,4 +1,4 @@
-import { getElementParents } from "./utilities-dom.js";
+import { getElementParents, isShadowRoot } from "./utilities-dom.js";
 import { SELECTOR_SEPARATOR } from "./constants.js";
 import { CSS_SELECTOR_TYPE, CssSelector, OPERATOR } from "./types.js";
 import {
@@ -14,14 +14,14 @@ export function getElementFallbackSelector(
   root?: ParentNode,
 ): CssSelector {
   const parentElements = getElementParents(element, root).reverse();
-  const isShadowRoot = root instanceof ShadowRoot;
+  const rootIsShadowRoot = isShadowRoot(root);
 
   const elementsData = parentElements.map((element, index) => {
     const elementData = createElementData(
       element,
       [CSS_SELECTOR_TYPE.nthchild],
       // do not use child combinator for the first element in ShadowRoot
-      isShadowRoot && index === 0 ? OPERATOR.NONE : OPERATOR.CHILD,
+      rootIsShadowRoot && index === 0 ? OPERATOR.NONE : OPERATOR.CHILD,
     );
     (elementData.selectors.nthchild ?? []).forEach((selectorData) => {
       selectorData.include = true;
@@ -30,7 +30,7 @@ export function getElementFallbackSelector(
   });
 
   // Don't use :scope prefix for ShadowRoot since it doesn't work correctly
-  const prefix = isShadowRoot ? "" : root ? ":scope" : ":root";
+  const prefix = rootIsShadowRoot ? "" : root ? ":scope" : ":root";
 
   return [prefix, ...elementsData.map(constructElementSelector)].join("");
 }

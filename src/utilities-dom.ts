@@ -62,6 +62,20 @@ export function getParents(elements: Element[], root?: ParentNode): Element[] {
 }
 
 /**
+ * Uses a nodeType check instead of instanceof to work across iframe
+ * boundaries. A shadow root is the only fragment node with a host.
+ */
+export function isShadowRoot(input: unknown): input is ShadowRoot {
+  return (
+    typeof input === "object" &&
+    input !== null &&
+    "nodeType" in input &&
+    (input as Node).nodeType === Node.DOCUMENT_FRAGMENT_NODE &&
+    "host" in input
+  );
+}
+
+/**
  * Returns root node for given element. This needs to be used because of document-less environments, e.g. jsdom.
  */
 export function getRootNode(element: Element): ParentNode {
