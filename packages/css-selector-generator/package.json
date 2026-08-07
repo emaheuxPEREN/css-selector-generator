@@ -41,9 +41,6 @@
     "lint": "eslint --config eslint.config.js",
     "lint:build": "npm run lint -- --max-warnings 0",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "preversion": "node ./config/assert-release-entrypoint.js",
-    "postversion": "git push && git push --tags && npm publish --access=public",
-    "version": "npm run build && npm run changelog && npm install --package-lock-only --prefix ../.. && git add -A",
     "watch:unit": "chokidar '{src,test}/**/*.ts' '../css-selector-generator-scenarios/**/*.{ts,html}' -c 'npm run test:unit'",
     "watch:playwright": "chokidar 'playwright-tests/**/*.ts' -c 'npm run test:playwright'"
   },

@@ -18,7 +18,7 @@
     "generate:scenarios": "npm run generate -w css-selector-generator-scenarios",
     "generate:readme": "node ./scripts/generate-package-readme.js",
     "generate:check": "npm run generate && git diff --exit-code -- packages/css-selector-generator-scenarios/src/generated.ts packages/css-selector-generator/README.md",
-    "release": "npm version --workspaces=false --prefix packages/css-selector-generator"
+    "release": "node ./scripts/release.js"
   },
   "repository": {
     "type": "git",
